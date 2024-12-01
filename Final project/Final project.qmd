@@ -6,6 +6,14 @@ date: "Fall 2024"
 format: html
 
 ---
+# workflow and team members
+Genevieve Madigan: #write your github Id here: 
+-responsibility: write up and data visualization
+Summer Negahdar: Summer99D
+-responsibility: creation of shiny app and data visualization
+Jenny Zhong: #write your github ID here
+-responsibility: data cleaning 
+
 
 
 ## Introduction and prior articles
