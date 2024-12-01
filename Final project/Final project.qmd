@@ -15,6 +15,45 @@ format: html
 
 ## Data Cleaning
 
+To Jenny and Gena: 
+things we need to do:
+1. upload temp app,
+add ave temp column and zipocode using this: 
+
+import pandas as pd
+import pgeocode
+
+# Load your CSV file
+df = pd.read_csv("temperature_data.csv")
+
+# Initialize the pgeocode geocoder
+geocoder = pgeocode.Nominatim("us")  # 'us' for the United States
+
+# Function to get ZIP code from latitude and longitude
+def get_zip_code(lat, lon):
+    result = geocoder.query_postal_code_from_coordinates(lat, lon)
+    return result.postal_code if result else None
+
+# Apply function to your data
+df["ZIP Code"] = df.apply(lambda row: get_zip_code(row["latitude"], row["longitude"]), axis=1)
+
+# Save the updated dataframe to a new CSV
+df.to_csv("temperature_data_with_zip.csv", index=False)
+
+2. save the file as df and as csv file (in the data folder)
+3. upload crime rate
+4. clean crime df
+5. save it as df and as csv (in data folder)
+6. merge both dfs based on ????
+7. make a scatterplot of crime rate and temperature
+8. make a base map (shapely)
+9. make a heated map using scatterplot and base map
+10. save the final merged csv(in data folder)
+11. shiny app
+12. (extra credit): use NLP for finding crime-heat (it sohuld not be hard I'd say)
+
+
+
 ```{python}
 ##installing the necessary packages
 import pandas as pd
@@ -24,6 +63,7 @@ import geopandas as gpd
 import shapely
 import shiny
 from shapely.geometry import Point
+import pgeocode
 ```
 
 
