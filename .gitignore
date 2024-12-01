@@ -1,6 +1,14 @@
 Crime Data/*.csv
 *.csv
 
+*.shp
+*.shx
+*.dbf
+*.prj
+*.cpg
+*.sbn
+*.sbx
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
