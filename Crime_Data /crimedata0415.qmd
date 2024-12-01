@@ -70,7 +70,7 @@ len(totalcrimedata)
 
 Load ZIP code shapefiles
 ```{python}
-zip_shapes = gpd.read_file("/Users/jennyzhong/Documents/GitHub/final-Project-DAP-II/ZIP_Code_Shapefiles/tl_2015_us_zcta510.shp")
+zip_shapes = gpd.read_file("/Users/jennyzhong/Documents/GitHub/final-Project-DAP-II/ZIP Code Shapefiles/tl_2015_us_zcta510.shp")
 ```
 
 ```{python}
