@@ -1,0 +1,25 @@
+---
+
+title: "DAP II:Final Project"
+author: "Genevieve Madigan, Summer Negahdar, Jenny Zhong"
+date: "Fall 2024"
+format: html
+
+---
+
+## Introduction and prior articles
+
+
+
+
+## Data Cleaning
+
+
+
+## Data experiment
+
+
+## Data Visualization
+
+
+## Shiny App
