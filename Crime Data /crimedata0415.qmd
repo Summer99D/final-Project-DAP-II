@@ -6,7 +6,12 @@ Merging crime data together
 1. Loading data together
 ```{python}
 import pandas as pd
+import geopandas as gpd
+import pandas as pd
+from shapely.geometry import Point
+```
 
+```{python}
 crime2004 = pd.read_csv('Crimes2004.csv')
 crime2005 = pd.read_csv('Crimes2005.csv')
 crimes67 = pd.read_csv('Crimes20062007.csv')
@@ -53,3 +58,13 @@ Summary statistics for numerical columns
 ```{python}
 print(totalcrimedata.describe())
 ```
+
+```{python}
+totalcrimedata.to_csv("totalcrimedata.csv", index=False)
+```
+
+Converting latitude and longitude to ZIP Codes
+```{python}
+len(totalcrimedata)
+```
+
