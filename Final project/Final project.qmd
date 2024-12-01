@@ -7,12 +7,24 @@ format: html
 
 ---
 
+
 ## Introduction and prior articles
 
 
 
 
 ## Data Cleaning
+
+```{python}
+##installing the necessary packages
+import pandas as pd
+import altair as alt
+import numpy as np
+import geopandas as gpd
+import shapely
+import shiny
+from shapely.geometry import Point
+```
 
 
 
