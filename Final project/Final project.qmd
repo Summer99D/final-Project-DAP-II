@@ -12,7 +12,7 @@ Genevieve Madigan: #write your github Id here:
 Summer Negahdar: Summer99D
 -responsibility: creation of shiny app and data visualization
 Jenny Zhong: #write your github ID here
--responsibility: data cleaning 
+-responsibility: data cleaning and preparation
 
 
 
