@@ -68,3 +68,38 @@ Converting latitude and longitude to ZIP Codes
 len(totalcrimedata)
 ```
 
+Load ZIP code shapefiles
+```{python}
+zip_shapes = gpd.read_file("/Users/jennyzhong/Documents/GitHub/final-Project-DAP-II/ZIP Code Shapefiles/tl_2015_us_zcta510.shp")
+```
+
+```{python}
+zip_shapes = zip_shapes.to_crs("EPSG:4326")
+print(zip_shapes.head())
+```
+
+crime geometry
+```{python}
+geometry = [Point(xy) for xy in zip(totalcrimedata['Longitude'], totalcrimedata['Latitude'])]
+```
+
+```{python}
+crime_gdf = gpd.GeoDataFrame(totalcrimedata, geometry=geometry, crs="EPSG:4326") 
+print(crime_gdf.head())
+```
+
+```{python}
+crime_gdf['geometry'] = crime_gdf.geometry.buffer(0.01)
+```
+
+Merging two data sets
+```{python}
+matched_data = gpd.sjoin(crime_gdf, zip_shapes, how="left", predicate="intersects")
+
+matched_data.to_csv("matched_data.csv", index=False)
+```
+
+clean data
+```{python}
+matched_data.drop(columns=['ID', 'District', 'Community Area', 'CLASSFP10', 'MTFCC10', 'FUNCSTAT10', 'ALAND10', 'AWATER10', 'FBI Code', 'Updated On', 'GEOID10'], inplace=True)
+```
