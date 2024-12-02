@@ -103,3 +103,41 @@ clean data
 ```{python}
 matched_data.drop(columns=['ID', 'District', 'Community Area', 'CLASSFP10', 'MTFCC10', 'FUNCSTAT10', 'ALAND10', 'AWATER10', 'FBI Code', 'Updated On', 'GEOID10'], inplace=True)
 ```
+
+operate from CSV file
+```{python}
+matched_data = pd.read_csv("matched_data.csv")
+print(matched_data.head())
+```
+
+Drop appropriate columns 
+```{python}
+matched_data.drop(columns=['ID', 'District', 'Community Area', 'CLASSFP10', 'MTFCC10', 'FUNCSTAT10', 'ALAND10', 'AWATER10', 'FBI Code', 'Updated On', 'GEOID10'], inplace=True)
+print(matched_data.head())
+```
+
+```{python}
+matched_data['Date'] = pd.to_datetime(matched_data['Date'], errors='coerce')
+```
+
+```{python}
+matched_data['YearMonthDay'] = matched_data['Date'].dt.date
+matched_data['Time'] = matched_data['Date'].dt.time
+```
+
+```{python}
+matched_data.drop(columns=['Date', 'Time', 'GEOID10', 'CLASSFP10', 'MTFCC10', 'FUNCSTAT10', 'ALAND10', 'AWATER10', 'Updated On', 'FBI Code'], inplace=True)
+matched_data.head(5)
+```
+
+```{python}
+columns = matched_data.columns.tolist()
+columns.remove('YearMonthDay')
+columns.insert(columns.index('Case Number') + 1, 'YearMonthDay')
+matched_data = matched_data[columns]
+print(matched_data.columns)
+```
+
+```{python}
+matched_data.to_csv("final_crime_data.csv", index=False)
+```
