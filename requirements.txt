@@ -1,4 +1,4 @@
-aiobotocore @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_bba52b0nnu/croot/aiobotocore_1701291516116/work
+
 aiohttp @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_b1m9c8aqie/croot/aiohttp_1707342290832/work
 aioitertools @ file:///tmp/build/80754af9/aioitertools_1607109665762/work
 aiosignal @ file:///tmp/build/80754af9/aiosignal_1637843061372/work
@@ -238,6 +238,7 @@ pathlib @ file:///Users/ktietz/demo/mc3/conda-bld/pathlib_1629713961906/work
 pathspec @ file:///Users/cbousseau/work/recipes/ci_py311_2/pathspec_1678995598596/work
 patsy==0.5.3
 pexpect @ file:///tmp/build/80754af9/pexpect_1605563209008/work
+pgeocode==0.5.0
 pickleshare @ file:///tmp/build/80754af9/pickleshare_1606932040724/work
 pillow @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_e02b4k5qik/croot/pillow_1707233036487/work
 pkce @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_da285fiplp/croot/pkce_1690384839054/work

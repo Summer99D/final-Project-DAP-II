@@ -26,6 +26,17 @@ Jenny Zhong: #write your github ID here
 To Jenny and Gena: 
 things we need to do:
 1. upload temp app,
+2. save the file as df and as csv file (in the data folder)
+3. upload crime rate
+4. clean crime df
+5. save it as df and as csv (in data folder)
+6. merge both dfs based on ????
+7. make a scatterplot of crime rate and temperature
+8. make a base map (shapely)
+9. make a heated map using scatterplot and base map
+10. save the final merged csv(in data folder)
+11. shiny app
+12. (extra credit): use NLP for finding crime-heat (it sohuld not be hard I'd say)
 
 
 # Load your CSV file
@@ -33,9 +44,12 @@ things we need to do:
 1. Loading data together
 ```{python}
 import pandas as pd
+import numpy as np
 import geopandas as gpd
-import pandas as pd
+import shapely
+import shiny
 from shapely.geometry import Point
+import pgeocode
 ```
 
 ```{python}
@@ -233,32 +247,6 @@ weather_with_zip.to_csv("final_weather_data.csv", index=False)
 
 
 
-
-2. save the file as df and as csv file (in the data folder)
-3. upload crime rate
-4. clean crime df
-5. save it as df and as csv (in data folder)
-6. merge both dfs based on ????
-7. make a scatterplot of crime rate and temperature
-8. make a base map (shapely)
-9. make a heated map using scatterplot and base map
-10. save the final merged csv(in data folder)
-11. shiny app
-12. (extra credit): use NLP for finding crime-heat (it sohuld not be hard I'd say)
-
-
-
-```{python}
-##installing the necessary packages
-import pandas as pd
-import altair as alt
-import numpy as np
-import geopandas as gpd
-import shapely
-import shiny
-from shapely.geometry import Point
-import pgeocode
-```
 
 
 
