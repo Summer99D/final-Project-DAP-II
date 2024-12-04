@@ -1,0 +1,143 @@
+---
+title: "Crime data merge"
+format: html
+---
+Merging crime data together
+1. Loading data together
+```{python}
+import pandas as pd
+import geopandas as gpd
+import pandas as pd
+from shapely.geometry import Point
+```
+
+```{python}
+crime2004 = pd.read_csv('Crimes2004.csv')
+crime2005 = pd.read_csv('Crimes2005.csv')
+crimes67 = pd.read_csv('Crimes20062007.csv')
+crimes8910 = pd.read_csv('Crimes20080910.csv')
+crimes1112 = pd.read_csv('Crimes20112012.csv')
+crimes131415 = pd.read_csv('Crimes201320142015.csv')
+```
+
+2. Examining the columns of crime data 
+```{python}
+print("2004 Columns:", crime2004.columns)
+print("2005 Columns:", crime2005.columns)
+print("2006 Columns:", crimes67.columns)
+```
+
+3. Merging all datasets together
+```{python}
+totalcrimedata = pd.concat([crime2004, crime2005, crimes67, crimes8910, crimes1112, crimes131415])
+``` 
+
+4. Examining the merged dataset
+```{python}
+print(totalcrimedata.info())
+```
+
+```{python}
+print(totalcrimedata.columns)
+```
+
+Columns are the following: 
+Index(['Case Number', 'Date', 'Block', 'IUCR', 'Primary Type', 'Description',
+       'Location Description', 'Arrest', 'Domestic', 'Beat', 'Ward',
+       'FBI Code', 'X Coordinate', 'Y Coordinate', 'Year', 'Latitude',
+       'Longitude', 'Location', 'ID', 'District', 'Community Area',
+       'Updated On'],
+      dtype='object')
+
+Whether all years exist
+```{python}
+print(totalcrimedata['Year'].value_counts())
+```
+
+Summary statistics for numerical columns 
+```{python}
+print(totalcrimedata.describe())
+```
+
+```{python}
+totalcrimedata.to_csv("totalcrimedata.csv", index=False)
+```
+
+Converting latitude and longitude to ZIP Codes
+```{python}
+len(totalcrimedata)
+```
+
+Load ZIP code shapefiles
+```{python}
+zip_shapes = gpd.read_file("/Users/jennyzhong/Documents/GitHub/final-Project-DAP-II/ZIP Code Shapefiles/tl_2015_us_zcta510.shp")
+```
+
+```{python}
+zip_shapes = zip_shapes.to_crs("EPSG:4326")
+print(zip_shapes.head())
+```
+
+crime geometry
+```{python}
+geometry = [Point(xy) for xy in zip(totalcrimedata['Longitude'], totalcrimedata['Latitude'])]
+```
+
+```{python}
+crime_gdf = gpd.GeoDataFrame(totalcrimedata, geometry=geometry, crs="EPSG:4326") 
+print(crime_gdf.head())
+```
+
+```{python}
+crime_gdf['geometry'] = crime_gdf.geometry.buffer(0.01)
+```
+
+Merging two data sets
+```{python}
+matched_data = gpd.sjoin(crime_gdf, zip_shapes, how="left", predicate="intersects")
+
+matched_data.to_csv("matched_data.csv", index=False)
+```
+
+clean data
+```{python}
+matched_data.drop(columns=['ID', 'District', 'Community Area', 'CLASSFP10', 'MTFCC10', 'FUNCSTAT10', 'ALAND10', 'AWATER10', 'FBI Code', 'Updated On', 'GEOID10'], inplace=True)
+```
+
+operate from CSV file
+```{python}
+matched_data = pd.read_csv("matched_data.csv")
+print(matched_data.head())
+```
+
+Drop appropriate columns 
+```{python}
+matched_data.drop(columns=['ID', 'District', 'Community Area', 'CLASSFP10', 'MTFCC10', 'FUNCSTAT10', 'ALAND10', 'AWATER10', 'FBI Code', 'Updated On', 'GEOID10'], inplace=True)
+print(matched_data.head())
+```
+
+```{python}
+matched_data['Date'] = pd.to_datetime(matched_data['Date'], errors='coerce')
+```
+
+```{python}
+matched_data['YearMonthDay'] = matched_data['Date'].dt.date
+matched_data['Time'] = matched_data['Date'].dt.time
+```
+
+```{python}
+matched_data.drop(columns=['Date', 'Time', 'GEOID10', 'CLASSFP10', 'MTFCC10', 'FUNCSTAT10', 'ALAND10', 'AWATER10', 'Updated On', 'FBI Code'], inplace=True)
+matched_data.head(5)
+```
+
+```{python}
+columns = matched_data.columns.tolist()
+columns.remove('YearMonthDay')
+columns.insert(columns.index('Case Number') + 1, 'YearMonthDay')
+matched_data = matched_data[columns]
+print(matched_data.columns)
+```
+
+```{python}
+matched_data.to_csv("final_crime_data.csv", index=False)
+```

@@ -26,28 +26,6 @@ Jenny Zhong: #write your github ID here
 To Jenny and Gena: 
 things we need to do:
 1. upload temp app,
-add ave temp column and zipocode using this: 
-
-import pandas as pd
-import pgeocode
-
-# Load your CSV file
-df = pd.read_csv("temperature_data.csv")
-
-# Initialize the pgeocode geocoder
-geocoder = pgeocode.Nominatim("us")  # 'us' for the United States
-
-# Function to get ZIP code from latitude and longitude
-def get_zip_code(lat, lon):
-    result = geocoder.query_postal_code_from_coordinates(lat, lon)
-    return result.postal_code if result else None
-
-# Apply function to your data
-df["ZIP Code"] = df.apply(lambda row: get_zip_code(row["latitude"], row["longitude"]), axis=1)
-
-# Save the updated dataframe to a new CSV
-df.to_csv("temperature_data_with_zip.csv", index=False)
-
 2. save the file as df and as csv file (in the data folder)
 3. upload crime rate
 4. clean crime df
@@ -61,11 +39,11 @@ df.to_csv("temperature_data_with_zip.csv", index=False)
 12. (extra credit): use NLP for finding crime-heat (it sohuld not be hard I'd say)
 
 
-
+# Load your CSV file
+# Crime data: Merging crime data together and merging crime data with ZIP Code
+1. Loading data together
 ```{python}
-##installing the necessary packages
 import pandas as pd
-import altair as alt
 import numpy as np
 import geopandas as gpd
 import shapely
@@ -73,6 +51,202 @@ import shiny
 from shapely.geometry import Point
 import pgeocode
 ```
+
+```{python}
+crime2004 = pd.read_csv('Crimes2004.csv')
+crime2005 = pd.read_csv('Crimes2005.csv')
+crimes67 = pd.read_csv('Crimes20062007.csv')
+crimes8910 = pd.read_csv('Crimes20080910.csv')
+crimes1112 = pd.read_csv('Crimes20112012.csv')
+crimes131415 = pd.read_csv('Crimes201320142015.csv')
+```
+
+2. Examining the columns of crime data 
+```{python}
+print("2004 Columns:", crime2004.columns)
+print("2005 Columns:", crime2005.columns)
+print("2006 Columns:", crimes67.columns)
+```
+
+3. Merging all datasets together
+```{python}
+totalcrimedata = pd.concat([crime2004, crime2005, crimes67, crimes8910, crimes1112, crimes131415])
+``` 
+
+4. Examining the merged dataset
+```{python}
+print(totalcrimedata.info())
+```
+
+
+Whether all years exist
+```{python}
+print(totalcrimedata['Year'].value_counts())
+```
+
+Summary statistics for numerical columns 
+```{python}
+print(totalcrimedata.describe())
+```
+
+```{python}
+totalcrimedata.to_csv("totalcrimedata.csv", index=False)
+```
+
+Converting latitude and longitude to ZIP Codes
+```{python}
+len(totalcrimedata)
+```
+
+Load ZIP code shapefiles
+```{python}
+zip_shapes = gpd.read_file("/Users/jennyzhong/Documents/GitHub/final-Project-DAP-II/ZIP Code Shapefiles/tl_2015_us_zcta510.shp")
+```
+
+```{python}
+zip_shapes = zip_shapes.to_crs("EPSG:4326")
+print(zip_shapes.head())
+```
+
+crime geometry
+```{python}
+geometry = [Point(xy) for xy in zip(totalcrimedata['Longitude'], totalcrimedata['Latitude'])]
+```
+
+```{python}
+crime_gdf = gpd.GeoDataFrame(totalcrimedata, geometry=geometry, crs="EPSG:4326") 
+print(crime_gdf.head())
+```
+
+```{python}
+crime_gdf['geometry'] = crime_gdf.geometry.buffer(0.01)
+```
+
+Merging two data sets
+```{python}
+matched_data = gpd.sjoin(crime_gdf, zip_shapes, how="left", predicate="intersects")
+
+matched_data.to_csv("matched_data.csv", index=False)
+```
+
+clean data
+```{python}
+matched_data.drop(columns=['ID', 'District', 'Community Area', 'CLASSFP10', 'MTFCC10', 'FUNCSTAT10', 'ALAND10', 'AWATER10', 'FBI Code', 'Updated On', 'GEOID10'], inplace=True)
+```
+
+operate from CSV file
+```{python}
+matched_data = pd.read_csv("matched_data.csv")
+print(matched_data.head())
+```
+
+Drop appropriate columns 
+```{python}
+matched_data.drop(columns=['ID', 'District', 'Community Area', 'CLASSFP10', 'MTFCC10', 'FUNCSTAT10', 'ALAND10', 'AWATER10', 'FBI Code', 'Updated On', 'GEOID10'], inplace=True)
+print(matched_data.head())
+```
+
+```{python}
+matched_data['Date'] = pd.to_datetime(matched_data['Date'], errors='coerce')
+```
+
+```{python}
+matched_data['YearMonthDay'] = matched_data['Date'].dt.date
+matched_data['Time'] = matched_data['Date'].dt.time
+```
+
+```{python}
+matched_data.drop(columns=['Date', 'Time', 'GEOID10', 'CLASSFP10', 'MTFCC10', 'FUNCSTAT10', 'ALAND10', 'AWATER10', 'Updated On', 'FBI Code'], inplace=True)
+matched_data.head(5)
+```
+
+```{python}
+columns = matched_data.columns.tolist()
+columns.remove('YearMonthDay')
+columns.insert(columns.index('Case Number') + 1, 'YearMonthDay')
+matched_data = matched_data[columns]
+print(matched_data.columns)
+```
+
+```{python}
+matched_data.to_csv("final_crime_data.csv", index=False)
+```
+
+# Merging weather data together and merging weather data with ZIP code 
+
+Merging all datasets together
+```{python}
+weather2004 = pd.read_csv('AT2004.csv')
+weather2005 = pd.read_csv('AT2005.csv')
+weather2006 = pd.read_csv('AT2006.csv')
+weather2007 = pd.read_csv('AT2007.csv')
+weather2008 = pd.read_csv('AT2008.csv')
+weather2009 = pd.read_csv('AT2009.csv')
+weather2010 = pd.read_csv('AT2010.csv')
+weather2011 = pd.read_csv('AT2011.csv')
+weather2012 = pd.read_csv('AT2012.csv')
+weather2013 = pd.read_csv('AT2013.csv')
+weather2014 = pd.read_csv('AT2014.csv')
+weather2015 = pd.read_csv('AT2015.csv')
+```
+
+```{python}
+total_weather = pd.concat([
+    weather2004, weather2005, weather2006, weather2007, weather2008, 
+    weather2009, weather2010, weather2011, weather2012, weather2013, 
+    weather2014, weather2015
+], ignore_index=True)
+
+total_weather_data.to_csv('merged_weather_data.csv', index=False)
+```
+
+```{python}
+total_weather.head(20)
+```
+
+convert weather data to geodataframe
+```{python}
+geometry = [Point(xy) for xy in zip(total_weather['LONGITUDE'], total_weather['LATITUDE'])]
+
+weather_gdf = gpd.GeoDataFrame(total_weather, geometry=geometry)
+
+weather_gdf.set_crs("EPSG:4326", inplace=True)
+
+weather_gdf['geometry'] = weather_gdf.geometry.buffer(0.01)
+```
+
+Load the ZIP Code Shapefile
+```{python}
+zip_shapefile = gpd.read_file('/Users/jennyzhong/Documents/GitHub/final-Project-DAP-II/ZIP_Code_Shapefiles/tl_2015_us_zcta510.shp')
+
+zip_shapefile = zip_shapefile.to_crs("EPSG:4326")
+```
+
+Spatial join to match the zip codes
+```{python}
+weather_with_zip = gpd.sjoin(weather_gdf, zip_shapefile, how='left', predicate='intersects')
+
+print(weather_with_zip.head())
+```
+
+drop irrelevant dataframes: 
+```{python}
+weather_with_zip.drop(["CLASSFP10", "MTFCC10", "FUNCSTAT10", "ALAND10", "AWATER10", "GEOID10"], axis=1, inplace=True)
+
+print(weather_with_zip)
+```
+
+final csv file for weather 
+```{python}
+weather_with_zip.to_csv("final_weather_data.csv", index=False)
+```
+
+# Apply function to your data
+
+# Save the updated dataframe to a new CSV
+
+
+
 
 
 
