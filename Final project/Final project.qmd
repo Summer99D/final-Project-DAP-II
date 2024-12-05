@@ -7,7 +7,7 @@ format: html
 
 ---
 # workflow and team members
-Genevieve Madigan: #write your github Id here: 
+Genevieve Madigan: #write your github Id here: Madigan989
 -responsibility: write up and data visualization
 Summer Negahdar: Summer99D
 -responsibility: creation of shiny app and data visualization
@@ -263,9 +263,49 @@ import pgeocode
 
 
 ## Data experiment
+```{python}
 
+```
 
 ## Data Visualization
+#merging the data
+
+```{python}
+
+final_crime_data = pd.read_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\final_crime_data.csv')
+final_weather_data = pd.read_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\final_weather_data.csv')
+
+
+```
+
+```{python}
+```
+
+```{python}
+import pandas as pd
+
+
+final_crime_data = pd.read_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\final_crime_data.csv')
+
+# Convert the 'YearMonthDay' column to datetime format
+final_crime_data['DATE'] = pd.to_datetime(final_crime_data['YearMonthDay'])
+
+# Filter for the years 2010 to 2015
+filtered_crime_data = final_crime_data[
+    (final_crime_data['DATE'].dt.year >= 2010) & (final_crime_data['DATE'].dt.year <= 2015)
+]
+
+# Display the filtered DataFrame
+print(filtered_crime_data.head())
+
+# Save the filtered dataset to a new file if needed
+filtered_crime_data.to_csv('filtered_crime_data.csv', index=False)
+
+```
+
+
+
+
 
 
 ## Shiny App
