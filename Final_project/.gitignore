@@ -176,3 +176,8 @@ cython_debug/
 #.idea/
 .DS_Store
 Svenv/
+
+##the large files to ignore
+short_weather_df.csv
+final_weather_data.csv
+final_crime_dara.csv
