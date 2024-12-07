@@ -16,12 +16,6 @@ import os
 
 Merging all datasets together
 ```{python}
-weather2004 = pd.read_csv('AT2004.csv')
-weather2005 = pd.read_csv('AT2005.csv')
-weather2006 = pd.read_csv('AT2006.csv')
-weather2007 = pd.read_csv('AT2007.csv')
-weather2008 = pd.read_csv('AT2008.csv')
-weather2009 = pd.read_csv('AT2009.csv')
 weather2010 = pd.read_csv('AT2010.csv')
 weather2011 = pd.read_csv('AT2011.csv')
 weather2012 = pd.read_csv('AT2012.csv')
@@ -31,9 +25,7 @@ weather2015 = pd.read_csv('AT2015.csv')
 ```
 
 ```{python}
-total_weather = pd.concat([
-    weather2004, weather2005, weather2006, weather2007, weather2008, 
-    weather2009, weather2010, weather2011, weather2012, weather2013, 
+total_weather = pd.concat([weather2010, weather2011, weather2012, weather2013, 
     weather2014, weather2015
 ], ignore_index=True)
 
