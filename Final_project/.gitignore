@@ -1,6 +1,3 @@
-Crime Data/*.csv
-*.csv
-
 *.shp
 *.shx
 *.dbf
@@ -177,3 +174,7 @@ cython_debug/
 .DS_Store
 Svenv/
 /.quarto/
+weather_raw.csv/
+short_weather_df.csv/
+filtered_crime_data.csv/
+
