@@ -216,13 +216,6 @@ Saving to a CSV file
 weatherfinal.to_csv('/Users/jennyzhong/Documents/GitHub/final-Project-DAP-II/Final project/Weather_Data/weather_raw.csv', index=False)
 ```
 
-# Apply function to your data
-
-
-
-# Save the updated dataframe to a new CSV
-
-
 
 ```{python}
 ##installing the necessary packages
