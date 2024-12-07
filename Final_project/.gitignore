@@ -180,7 +180,7 @@ Svenv/
 ##the large files to ignore
 short_weather_df.csv
 final_weather_data.csv
-final_crime_dara.csv
+final_crime_data.csv
 /.quarto/
 Crimes2010.csv
 Crimes20112012.csv
