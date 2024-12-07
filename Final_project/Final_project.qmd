@@ -8,7 +8,6 @@ execute:
   echo: false
   eval: true
 
-
 ---
 ## the link to google drive for data
 
@@ -249,13 +248,3 @@ final csv file for weather
 weather_with_zip.to_csv("final_weather_data.csv", index=False)
 ```
 
-```{python}
-
-
-```
-
-
-## Data Visualization
-
-
-## Shiny App
