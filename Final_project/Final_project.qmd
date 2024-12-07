@@ -4,24 +4,15 @@ title: "DAP II:Final Project"
 author: "Genevieve Madigan, Summer Negahdar, Jenny Zhong"
 date: "Fall 2024"
 format: html
-execute:
-  echo: false
-  eval: true
-
 
 ---
-## the link to google drive for data
-
-https://drive.google.com/drive/folders/1U2egyK2B7HBMOuB5wlj-HAs8HkjFLrJk?usp=drive_link
-
 # workflow and team members
 Genevieve Madigan: #write your github Id here: 
 -responsibility: write up and data visualization
 Summer Negahdar: Summer99D
 -responsibility: creation of shiny app and data visualization
-Jenny Zhong: #write your github ID here
+Jenny Zhong: datapolicypython
 -responsibility: data cleaning and preparation
-
 
 
 ## Introduction and prior articles
@@ -34,17 +25,6 @@ Jenny Zhong: #write your github ID here
 To Jenny and Gena: 
 things we need to do:
 1. upload temp app,
-2. save the file as df and as csv file (in the data folder)
-3. upload crime rate
-4. clean crime df
-5. save it as df and as csv (in data folder)
-6. merge both dfs based on ????
-7. make a scatterplot of crime rate and temperature
-8. make a base map (shapely)
-9. make a heated map using scatterplot and base map
-10. save the final merged csv(in data folder)
-11. shiny app
-12. (extra credit): use NLP for finding crime-heat (it sohuld not be hard I'd say)
 
 
 # Load your CSV file
@@ -52,36 +32,29 @@ things we need to do:
 1. Loading data together
 ```{python}
 import pandas as pd
-import numpy as np
 import geopandas as gpd
-import shapely
-import shiny
+import pandas as pd
 from shapely.geometry import Point
-
 ```
 
+After the presentation, we decided that we would shorten our datasets to 2010 - 2015. Subsequently, the code we have accommodates that below. 
 ```{python}
-crime2004 = pd.read_csv('Crimes2004.csv')
-crime2005 = pd.read_csv('Crimes2005.csv')
-crimes67 = pd.read_csv('Crimes20062007.csv')
-crimes8910 = pd.read_csv('Crimes20080910.csv')
+crimes10 = pd.read_csv('Crimes2010.csv')
 crimes1112 = pd.read_csv('Crimes20112012.csv')
 crimes131415 = pd.read_csv('Crimes201320142015.csv')
 ```
 
 2. Examining the columns of crime data 
 ```{python}
-print("2004 Columns:", crime2004.columns)
-print("2005 Columns:", crime2005.columns)
-print("2006 Columns:", crimes67.columns)
+print("2010 Columns:", crimes10.columns)
 ```
 
 3. Merging all datasets together
 ```{python}
-totalcrimedata = pd.concat([crime2004, crime2005, crimes67, crimes8910, crimes1112, crimes131415])
+totalcrimedata = pd.concat([crimes2010, crimes1112, crimes131415])
 ``` 
 
-4. Examining the merged dataset
+Examining the merged dataset
 ```{python}
 print(totalcrimedata.info())
 ```
@@ -95,10 +68,6 @@ print(totalcrimedata['Year'].value_counts())
 Summary statistics for numerical columns 
 ```{python}
 print(totalcrimedata.describe())
-```
-
-```{python}
-totalcrimedata.to_csv("totalcrimedata.csv", index=False)
 ```
 
 Converting latitude and longitude to ZIP Codes
@@ -134,17 +103,17 @@ Merging two data sets
 ```{python}
 matched_data = gpd.sjoin(crime_gdf, zip_shapes, how="left", predicate="intersects")
 
-matched_data.to_csv("matched_data.csv", index=False)
+# matched_data.to_csv("filtered_crime_data.csv", index=False)
 ```
 
-clean data
+Clean data
 ```{python}
 matched_data.drop(columns=['ID', 'District', 'Community Area', 'CLASSFP10', 'MTFCC10', 'FUNCSTAT10', 'ALAND10', 'AWATER10', 'FBI Code', 'Updated On', 'GEOID10'], inplace=True)
 ```
 
-operate from CSV file
+Operate from CSV file
 ```{python}
-matched_data = pd.read_csv("matched_data.csv")
+matched_data = pd.read_csv("filtered_crime_data.csv")
 print(matched_data.head())
 ```
 
@@ -177,19 +146,13 @@ print(matched_data.columns)
 ```
 
 ```{python}
-matched_data.to_csv("final_crime_data.csv", index=False)
+matched_data.to_csv("filtered_crime_data.csv", index=False)
 ```
 
 # Merging weather data together and merging weather data with ZIP code 
 
 Merging all datasets together
 ```{python}
-weather2004 = pd.read_csv('AT2004.csv')
-weather2005 = pd.read_csv('AT2005.csv')
-weather2006 = pd.read_csv('AT2006.csv')
-weather2007 = pd.read_csv('AT2007.csv')
-weather2008 = pd.read_csv('AT2008.csv')
-weather2009 = pd.read_csv('AT2009.csv')
 weather2010 = pd.read_csv('AT2010.csv')
 weather2011 = pd.read_csv('AT2011.csv')
 weather2012 = pd.read_csv('AT2012.csv')
@@ -199,20 +162,10 @@ weather2015 = pd.read_csv('AT2015.csv')
 ```
 
 ```{python}
-total_weather = pd.concat([
-    weather2004, weather2005, weather2006, weather2007, weather2008, 
-    weather2009, weather2010, weather2011, weather2012, weather2013, 
-    weather2014, weather2015
-], ignore_index=True)
-
-total_weather_data.to_csv('merged_weather_data.csv', index=False)
+total_weather = pd.concat([weather2010, weather2011, weather2012, weather2013, weather2014, weather2015], ignore_index=True)
 ```
 
-```{python}
-total_weather.head(20)
-```
-
-convert weather data to geodataframe
+Convert weather data to geodataframe
 ```{python}
 geometry = [Point(xy) for xy in zip(total_weather['LONGITUDE'], total_weather['LATITUDE'])]
 
@@ -237,22 +190,69 @@ weather_with_zip = gpd.sjoin(weather_gdf, zip_shapefile, how='left', predicate='
 print(weather_with_zip.head())
 ```
 
-drop irrelevant dataframes: 
+Drop irrelevant dataframes: 
 ```{python}
 weather_with_zip.drop(["CLASSFP10", "MTFCC10", "FUNCSTAT10", "ALAND10", "AWATER10", "GEOID10"], axis=1, inplace=True)
 
 print(weather_with_zip)
 ```
 
-final csv file for weather 
+Final CSV file for weather 
 ```{python}
-weather_with_zip.to_csv("final_weather_data.csv", index=False)
+weather_with_zip.to_csv("weather_with_zip.csv", index=False)
+```
+
+Loading CSV file 
+```{python}
+weatherfinal = pd.read_csv('/Users/jennyzhong/Documents/GitHub/final-Project-DAP-II/Final project/Weather_Data/weather_with_zip.csv')
 ```
 
 ```{python}
-
-
+weatherfinal.head(10)
+weatherfinal = weatherfinal.drop(columns=['TMAX', 'TMIN', 'ELEVATION', 'index_right'])
 ```
+
+```{python}
+weatherfinal.to_csv('/Users/jennyzhong/Documents/GitHub/final-Project-DAP-II/Final project/Weather_Data/weatherfinal_cleaned.csv', index=False)
+```
+
+# Apply function to your data
+
+
+# Save the updated dataframe to a new CSV
+
+
+
+
+2. save the file as df and as csv file (in the data folder)
+3. upload crime rate
+4. clean crime df
+5. save it as df and as csv (in data folder)
+6. merge both dfs based on ????
+7. make a scatterplot of crime rate and temperature
+8. make a base map (shapely)
+9. make a heated map using scatterplot and base map
+10. save the final merged csv(in data folder)
+11. shiny app
+12. (extra credit): use NLP for finding crime-heat (it sohuld not be hard I'd say)
+
+
+
+```{python}
+##installing the necessary packages
+import pandas as pd
+import altair as alt
+import numpy as np
+import geopandas as gpd
+import shapely
+import shiny
+from shapely.geometry import Point
+import pgeocode
+```
+
+
+
+## Data experiment
 
 
 ## Data Visualization
