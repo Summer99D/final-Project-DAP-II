@@ -463,12 +463,13 @@ plt.show()
 
 We explain the following graphs here: 
 
+This bar chart demonstrates crime frequency across temperature ranges, revealing a significant increase in crimes at higher temperatures. This aligns with routine activity theory, as warmer temperatures encourage outdoor activities, potentially increasing encounters between offenders and victims. Conversely, fewer crimes generally occur in colder temperature ranges,, likely due to reduced outdoor activities and interactions.
 ![Graph 1 Description](Graphs/graph1.jpeg)
 
-
+This chart illustrates the trend of crime occurrences over time, highlighting a noticeable increase during the summer months, suggesting a seasonal pattern in criminal activity.
 ![Graph 2 Description](Graphs/Graph2.jpeg)
 
-
+This choropleth map displays crime locations in Chicago, with points indicating crime occurrences and their color representing the temperature. Red points signify higher temperatures, while blue points indicate lower temperatures. The map shows that red points are more prominent, suggesting that crimes are more frequent during warmer weather. This highlights a possible connection between temperature and crime rates.
 ![Graph 3 Description](Graphs/Graph3.jpeg)
 
 
