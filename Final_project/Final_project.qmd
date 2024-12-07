@@ -1,14 +1,14 @@
 ---
 
-title: "DAP II:Final Project"
+title: "DAP II: Final Project"
 author: "Genevieve Madigan, Summer Negahdar, Jenny Zhong"
 date: "Fall 2024"
 format: 
   html:
     default-code-block-options:
-      eval: true
-      echo: false
-
+      eval: true  # Code will not be executed, no output from it
+      echo: false 
+      
 ---
 # Workflow and team members
 Genevieve Madigan: Madigan989

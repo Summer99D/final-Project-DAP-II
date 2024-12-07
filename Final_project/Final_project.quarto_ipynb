@@ -6,15 +6,15 @@
       "source": [
         "---\n",
         "\n",
-        "title: \"DAP II:Final Project\"\n",
+        "title: \"DAP II: Final Project\"\n",
         "author: \"Genevieve Madigan, Summer Negahdar, Jenny Zhong\"\n",
         "date: \"Fall 2024\"\n",
         "format: \n",
         "  html:\n",
         "    default-code-block-options:\n",
-        "      eval: true\n",
-        "      echo: false\n",
-        "\n",
+        "      eval: true  # Code will not be executed, no output from it\n",
+        "      echo: false \n",
+        "      \n",
         "---\n",
         "\n",
         "# Workflow and team members\n",
@@ -48,7 +48,7 @@
         "# Crime data: Merging crime data together and merging crime data with ZIP Code\n",
         "1. Loading data together"
       ],
-      "id": "b7c383a3"
+      "id": "6b29df03"
     },
     {
       "cell_type": "code",
@@ -64,7 +64,7 @@
         "import numpy as np\n",
         "import shiny"
       ],
-      "id": "d278d8fd",
+      "id": "e952217a",
       "execution_count": null,
       "outputs": []
     },
@@ -76,7 +76,7 @@
         "\n",
         "First, we load the CSV datasets into dataframes into python"
       ],
-      "id": "1054b3e0"
+      "id": "1000e37d"
     },
     {
       "cell_type": "code",
@@ -86,7 +86,7 @@
         "crimes1112 = pd.read_csv('Crimes20112012.csv')\n",
         "crimes131415 = pd.read_csv('Crimes201320142015.csv')"
       ],
-      "id": "655ab22a",
+      "id": "293600ed",
       "execution_count": null,
       "outputs": []
     },
@@ -96,7 +96,7 @@
       "source": [
         "Then we examine the columns of crime data "
       ],
-      "id": "62f11b67"
+      "id": "50f60570"
     },
     {
       "cell_type": "code",
@@ -104,7 +104,7 @@
       "source": [
         "print(\"2010 Columns:\", crimes10.columns)"
       ],
-      "id": "17c33965",
+      "id": "9fa90f3f",
       "execution_count": null,
       "outputs": []
     },
@@ -114,7 +114,7 @@
       "source": [
         "We then merge the datasets together so we have a crime rate dataset from 2010 - 2015 and examine it."
       ],
-      "id": "3827fecb"
+      "id": "66ef72d6"
     },
     {
       "cell_type": "code",
@@ -123,7 +123,7 @@
         "totalcrimedata = pd.concat([crimes2010, crimes1112, crimes131415])\n",
         "print(totalcrimedata.info())"
       ],
-      "id": "e7c5040f",
+      "id": "b7cb728f",
       "execution_count": null,
       "outputs": []
     },
@@ -133,7 +133,7 @@
       "source": [
         "Summary statistics for numerical columns "
       ],
-      "id": "4b51ab78"
+      "id": "6eddd642"
     },
     {
       "cell_type": "code",
@@ -141,7 +141,7 @@
       "source": [
         "print(totalcrimedata.describe())"
       ],
-      "id": "14644717",
+      "id": "492962b8",
       "execution_count": null,
       "outputs": []
     },
@@ -152,7 +152,7 @@
         "# Now we will convert the longitude and latitude in the crime data into ZIP Code by using an external shapefile and cross referencing this shapefule with our crime dataset\n",
         "Load ZIP code shapefiles"
       ],
-      "id": "970334ee"
+      "id": "df090326"
     },
     {
       "cell_type": "code",
@@ -160,7 +160,7 @@
       "source": [
         "zip_shapes = gpd.read_file(\"/Users/jennyzhong/Documents/GitHub/final-Project-DAP-II/ZIP Code Shapefiles/tl_2015_us_zcta510.shp\")"
       ],
-      "id": "80ed6cb2",
+      "id": "72551131",
       "execution_count": null,
       "outputs": []
     },
@@ -170,7 +170,7 @@
       "source": [
         "Here, we are transforming spatial data into a consistent coordinate reference system (EPSG:4326), creating geometric points from longitude and latitude, and combining this data into a GeoDataFrame for spatial analysis."
       ],
-      "id": "89cd7e12"
+      "id": "82bc9b39"
     },
     {
       "cell_type": "code",
@@ -179,7 +179,7 @@
         "zip_shapes = zip_shapes.to_crs(\"EPSG:4326\")\n",
         "print(zip_shapes.head())"
       ],
-      "id": "b39db933",
+      "id": "75bc966f",
       "execution_count": null,
       "outputs": []
     },
@@ -189,7 +189,7 @@
       "source": [
         "geometry = [Point(xy) for xy in zip(totalcrimedata['Longitude'], totalcrimedata['Latitude'])]"
       ],
-      "id": "64b6e3f6",
+      "id": "5d1e5783",
       "execution_count": null,
       "outputs": []
     },
@@ -200,7 +200,7 @@
         "crime_gdf = gpd.GeoDataFrame(totalcrimedata, geometry=geometry, crs=\"EPSG:4326\") \n",
         "print(crime_gdf.head())"
       ],
-      "id": "e521e5c2",
+      "id": "e0e7671e",
       "execution_count": null,
       "outputs": []
     },
@@ -210,7 +210,7 @@
       "source": [
         "Then we are creating buffer zones around each geometry point in crime_gdf with a radius of 0.01 units, modifying the geometry column to reflect these expanded areas."
       ],
-      "id": "f630b6fa"
+      "id": "f9621ac1"
     },
     {
       "cell_type": "code",
@@ -218,7 +218,7 @@
       "source": [
         "crime_gdf['geometry'] = crime_gdf.geometry.buffer(0.01)"
       ],
-      "id": "92fdf48d",
+      "id": "4ee5c9c8",
       "execution_count": null,
       "outputs": []
     },
@@ -228,7 +228,7 @@
       "source": [
         "We are then performing a spatial join to match crime_gdf (containing crime data) with zip_shapes based on their spatial intersection, and saving the resulting data to a CSV file."
       ],
-      "id": "b06f5feb"
+      "id": "d145ef6f"
     },
     {
       "cell_type": "code",
@@ -238,7 +238,7 @@
         "\n",
         "matched_data.to_csv(\"filtered_crime_data.csv\", index=False)"
       ],
-      "id": "93836c9d",
+      "id": "89de24fb",
       "execution_count": null,
       "outputs": []
     },
@@ -248,7 +248,7 @@
       "source": [
         "Operate from CSV file"
       ],
-      "id": "122af126"
+      "id": "f63d988d"
     },
     {
       "cell_type": "code",
@@ -257,7 +257,7 @@
         "matched_data = pd.read_csv(\"filtered_crime_data.csv\")\n",
         "print(matched_data.head())"
       ],
-      "id": "b611c9ed",
+      "id": "677bc818",
       "execution_count": null,
       "outputs": []
     },
@@ -267,7 +267,7 @@
       "source": [
         "Drop appropriate columns "
       ],
-      "id": "90dc06e6"
+      "id": "6d6e25ca"
     },
     {
       "cell_type": "code",
@@ -276,7 +276,7 @@
         "matched_data.drop(columns=['ID', 'District', 'Community Area', 'CLASSFP10', 'MTFCC10', 'FUNCSTAT10', 'ALAND10', 'AWATER10', 'FBI Code', 'Updated On', 'GEOID10'], inplace=True)\n",
         "print(matched_data.head())"
       ],
-      "id": "0e22135e",
+      "id": "f4b9fdc3",
       "execution_count": null,
       "outputs": []
     },
@@ -286,7 +286,7 @@
       "source": [
         "Convert the Date column to a datetime format"
       ],
-      "id": "30045081"
+      "id": "2010a386"
     },
     {
       "cell_type": "code",
@@ -294,7 +294,7 @@
       "source": [
         "matched_data['Date'] = pd.to_datetime(matched_data['Date'], errors='coerce')"
       ],
-      "id": "c9f060bc",
+      "id": "ab22621b",
       "execution_count": null,
       "outputs": []
     },
@@ -304,7 +304,7 @@
       "source": [
         "Create new columns (YearMonthDay and Time) to separately store the date and time components of the Date column. "
       ],
-      "id": "2c7fb8a2"
+      "id": "617ddc72"
     },
     {
       "cell_type": "code",
@@ -313,7 +313,7 @@
         "matched_data['YearMonthDay'] = matched_data['Date'].dt.date\n",
         "matched_data['Time'] = matched_data['Date'].dt.time"
       ],
-      "id": "ab7ba9b0",
+      "id": "7809c454",
       "execution_count": null,
       "outputs": []
     },
@@ -323,7 +323,7 @@
       "source": [
         "Rearrange the columns to place YearMonthDay immediately after Case Number for better organization"
       ],
-      "id": "bc0b1303"
+      "id": "365902a8"
     },
     {
       "cell_type": "code",
@@ -335,7 +335,7 @@
         "matched_data = matched_data[columns]\n",
         "print(matched_data.columns)"
       ],
-      "id": "25e87015",
+      "id": "ba6e8a24",
       "execution_count": null,
       "outputs": []
     },
@@ -345,7 +345,7 @@
       "source": [
         "Save the cleaned and restructured data to a CSV file"
       ],
-      "id": "a12063b0"
+      "id": "948ec51b"
     },
     {
       "cell_type": "code",
@@ -353,7 +353,7 @@
       "source": [
         "matched_data.to_csv(\"filtered_crime_data.csv\", index=False)"
       ],
-      "id": "d2527212",
+      "id": "3471cdd1",
       "execution_count": null,
       "outputs": []
     },
@@ -365,7 +365,7 @@
         "\n",
         "Merging all 2010 - 2015 datasets together. The process is similar to the above. "
       ],
-      "id": "7f497a3a"
+      "id": "9f0febba"
     },
     {
       "cell_type": "code",
@@ -378,7 +378,7 @@
         "weather2014 = pd.read_csv('AT2014.csv')\n",
         "weather2015 = pd.read_csv('AT2015.csv')"
       ],
-      "id": "cdc3febf",
+      "id": "fb3df547",
       "execution_count": null,
       "outputs": []
     },
@@ -388,7 +388,7 @@
       "source": [
         "total_weather = pd.concat([weather2010, weather2011, weather2012, weather2013, weather2014, weather2015], ignore_index=True)"
       ],
-      "id": "a9510f6d",
+      "id": "00a460d4",
       "execution_count": null,
       "outputs": []
     },
@@ -398,7 +398,7 @@
       "source": [
         "Convert weather data to geodataframe"
       ],
-      "id": "98cea2a3"
+      "id": "4e355bb2"
     },
     {
       "cell_type": "code",
@@ -412,7 +412,7 @@
         "\n",
         "weather_gdf['geometry'] = weather_gdf.geometry.buffer(0.01)"
       ],
-      "id": "0ba13e76",
+      "id": "03835cde",
       "execution_count": null,
       "outputs": []
     },
@@ -422,7 +422,7 @@
       "source": [
         "Load the ZIP Code Shapefile"
       ],
-      "id": "f9dc1eeb"
+      "id": "848403bf"
     },
     {
       "cell_type": "code",
@@ -432,7 +432,7 @@
         "\n",
         "zip_shapefile = zip_shapefile.to_crs(\"EPSG:4326\")"
       ],
-      "id": "0bc59735",
+      "id": "ea122f2d",
       "execution_count": null,
       "outputs": []
     },
@@ -442,7 +442,7 @@
       "source": [
         "Spatial join to match the zip codes"
       ],
-      "id": "83fbe968"
+      "id": "67cc0084"
     },
     {
       "cell_type": "code",
@@ -452,7 +452,7 @@
         "\n",
         "print(weather_with_zip.head())"
       ],
-      "id": "2fe45188",
+      "id": "ede744a7",
       "execution_count": null,
       "outputs": []
     },
@@ -462,7 +462,7 @@
       "source": [
         "Drop irrelevant dataframes: "
       ],
-      "id": "ad2bcebc"
+      "id": "bf725d5e"
     },
     {
       "cell_type": "code",
@@ -472,7 +472,7 @@
         "\n",
         "print(weather_with_zip)"
       ],
-      "id": "e9a59a0e",
+      "id": "27f9322b",
       "execution_count": null,
       "outputs": []
     },
@@ -482,7 +482,7 @@
       "source": [
         "Final CSV file for weather "
       ],
-      "id": "b5abe4a8"
+      "id": "5c06aaad"
     },
     {
       "cell_type": "code",
@@ -490,7 +490,7 @@
       "source": [
         "weather_with_zip.to_csv(\"weather_with_zip.csv\", index=False)"
       ],
-      "id": "026aaa9f",
+      "id": "c31d95c6",
       "execution_count": null,
       "outputs": []
     },
@@ -500,7 +500,7 @@
       "source": [
         "Loading CSV file "
       ],
-      "id": "bf834d39"
+      "id": "776fedd2"
     },
     {
       "cell_type": "code",
@@ -508,7 +508,7 @@
       "source": [
         "weatherfinal = pd.read_csv('/Users/jennyzhong/Documents/GitHub/final-Project-DAP-II/Final project/Weather_Data/weather_with_zip.csv')"
       ],
-      "id": "e2b54478",
+      "id": "83f244ae",
       "execution_count": null,
       "outputs": []
     },
@@ -518,7 +518,7 @@
       "source": [
         "Dropping unnecessary columns"
       ],
-      "id": "7d4beace"
+      "id": "1d4f6d5a"
     },
     {
       "cell_type": "code",
@@ -527,7 +527,7 @@
         "weatherfinal.head(10)\n",
         "weatherfinal = weatherfinal.drop(columns=['TMAX', 'TMIN', 'ELEVATION', 'index_right'])"
       ],
-      "id": "e4c89282",
+      "id": "18b9f7fc",
       "execution_count": null,
       "outputs": []
     },
@@ -537,7 +537,7 @@
       "source": [
         "Saving to a CSV file "
       ],
-      "id": "44b42c47"
+      "id": "5e7cd134"
     },
     {
       "cell_type": "code",
@@ -545,7 +545,7 @@
       "source": [
         "weatherfinal.to_csv('/Users/jennyzhong/Documents/GitHub/final-Project-DAP-II/Final project/Weather_Data/weather_raw.csv', index=False)"
       ],
-      "id": "57469dca",
+      "id": "024dc86d",
       "execution_count": null,
       "outputs": []
     },
@@ -559,7 +559,7 @@
         "\n",
         "# Save the updated dataframe to a new CSV\n"
       ],
-      "id": "002dedc9"
+      "id": "124527e7"
     },
     {
       "cell_type": "code",
@@ -576,7 +576,7 @@
         "#from shapely.geometry import Point\n",
         "#import pgeocode"
       ],
-      "id": "cf274eed",
+      "id": "e113e1f6",
       "execution_count": null,
       "outputs": []
     },
@@ -593,7 +593,46 @@
         "#2010-2015 because 30 GB is way too much, the following code is how we \n",
         "#shrunk the data \n"
       ],
-      "id": "43e9978e"
+      "id": "d062cadf"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "##installing the necessary packages\n",
+        "import pandas as pd\n",
+        "import matplotlib.pyplot as plt\n",
+        "import altair as alt\n",
+        "import numpy as np\n",
+        "import geopandas as gpd\n",
+        "import shapely\n",
+        "import shiny\n",
+        "\n",
+        "\n",
+        "from shapely.geometry import Point\n",
+        "import matplotlib.pyplot as plt\n",
+        "\n",
+        "#from shapely.geometry import Point\n",
+        "#import pgeocode"
+      ],
+      "id": "ef6dc4d4",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Data experiment\n",
+        "\n",
+        "\n",
+        "## Data Visualization\n",
+        "#merging the data\n",
+        "#For the following data, we decided to filter the information down to \n",
+        "#2010-2015 because 30 GB is way too much, the following code is how we \n",
+        "#shrunk the data \n"
+      ],
+      "id": "099a9518"
     },
     {
       "cell_type": "code",
@@ -602,7 +641,7 @@
         "#final_crime_data = pd.read_csv(r'C:\\Users\\madig\\Documents\\Github\\Year 2024-2025\\final-Project-DAP-II\\final_crime_data.csv')\n",
         "#final_weather_data = pd.read_csv(r'C:\\Users\\madig\\Documents\\Github\\Year 2024-2025\\final-Project-DAP-II\\final_weather_data.csv')"
       ],
-      "id": "f101af79",
+      "id": "5831a1bf",
       "execution_count": null,
       "outputs": []
     },
@@ -617,7 +656,7 @@
         "#]\n",
         "#filtered_crime_data.to_csv('filtered_crime_data.csv', index=False)"
       ],
-      "id": "a5164969",
+      "id": "c9f7ee3a",
       "execution_count": null,
       "outputs": []
     },
@@ -631,7 +670,7 @@
         "\n",
         "And making a function to group crime types\n"
       ],
-      "id": "396c2c52"
+      "id": "d3c213d6"
     },
     {
       "cell_type": "code",
@@ -640,7 +679,7 @@
         "filtered_weather_data = pd.read_csv(r'C:\\Users\\madig\\Documents\\Github\\Year 2024-2025\\final-Project-DAP-II\\Final project\\weatherfinal_cleaned.csv')\n",
         "filtered_crime_data = pd.read_csv(r'C:\\Users\\madig\\Documents\\Github\\Year 2024-2025\\final-Project-DAP-II\\Final project\\filtered_crime_data.csv')"
       ],
-      "id": "992c8164",
+      "id": "54790ebe",
       "execution_count": null,
       "outputs": []
     },
@@ -684,7 +723,7 @@
         "\n",
         "print(filtered_crime_data.head())"
       ],
-      "id": "2503a0d8",
+      "id": "8aaefc9c",
       "execution_count": null,
       "outputs": []
     },
@@ -694,20 +733,18 @@
       "source": [
         "Merging\n"
       ],
-      "id": "51d397d6"
+      "id": "93b943e4"
     },
     {
       "cell_type": "code",
       "metadata": {},
       "source": [
-        "# Ensure DATE columns are in datetime format\n",
         "filtered_crime_data['DATE'] = pd.to_datetime(filtered_crime_data['DATE'])\n",
         "filtered_weather_data['DATE'] = pd.to_datetime(filtered_weather_data['DATE'])\n",
         "\n",
-        "# Group the crime data to create a Crime Count column\n",
         "crime_summary = filtered_crime_data.groupby(['DATE', 'ZIP_CODE', 'Crime Type Group']).size().reset_index(name='Crime Count')\n",
         "\n",
-        "# Merge the grouped crime summary with the weather data on DATE and ZIP_CODE\n",
+        "\n",
         "merged_data = pd.merge(\n",
         "    crime_summary,\n",
         "    filtered_weather_data[['DATE', 'ZIP_CODE', 'TAVG', 'geometry']],  # Select relevant weather columns\n",
@@ -715,13 +752,11 @@
         "    how='inner'  # Use 'inner' to match rows in both datasets\n",
         ")\n",
         "\n",
-        "# Display the first few rows of the merged dataset\n",
         "print(merged_data.head())\n",
         "\n",
-        "# Save the merged dataset to a CSV file\n",
-        "merged_data.to_csv(r'C:\\Users\\madig\\Documents\\Github\\Year 2024-2025\\final-Project-DAP-II\\Final project\\merged_data.csv', index=False)\n"
+        "merged_data.to_csv(r'C:\\Users\\madig\\Documents\\Github\\Year 2024-2025\\final-Project-DAP-II\\Final project\\merged_data.csv', index=False)"
       ],
-      "id": "7cc3661a",
+      "id": "aeed71fd",
       "execution_count": null,
       "outputs": []
     },
@@ -730,9 +765,11 @@
       "metadata": {},
       "source": [
         "#Now that the data is filtered lets make the two charts\n",
+        "\n",
+        "\n",
         "#BarChart\n"
       ],
-      "id": "71459d6e"
+      "id": "a61c0b31"
     },
     {
       "cell_type": "code",
@@ -741,7 +778,6 @@
         "import pandas as pd\n",
         "import matplotlib.pyplot as plt\n",
         "\n",
-        "# Bin the temperature data into 15-unit ranges\n",
         "filtered_weather_data['TAVG_bin'] = pd.cut(\n",
         "    filtered_weather_data['TAVG'], \n",
         "    bins=range(int(filtered_weather_data['TAVG'].min()) // 15 * 15, \n",
@@ -750,7 +786,6 @@
         "    right=False\n",
         ")\n",
         "\n",
-        "# Merge crime and weather data to keep crime group info\n",
         "merged_data_with_bins = pd.merge(\n",
         "    merged_data,\n",
         "    filtered_weather_data[['DATE', 'TAVG_bin']], \n",
@@ -758,21 +793,19 @@
         "    how='left'\n",
         ")\n",
         "\n",
-        "# Group data by TAVG_bin and Crime Type Group\n",
         "crime_distribution = merged_data_with_bins.groupby(['TAVG_bin', 'Crime Type Group'])['Crime Count'].sum().unstack(fill_value=0)\n",
         "\n",
-        "# Plot stacked bar chart\n",
         "crime_distribution.plot(kind='bar', stacked=True, figsize=(12, 7), width=0.9)\n",
         "plt.title('Crime Distribution by Temperature Range (Binned by 15)')\n",
         "plt.xlabel('Temperature Range (°F)')\n",
         "plt.ylabel('Total Crime Count')\n",
-        "plt.xticks(rotation=45, ha='right')  # Rotate x-axis labels for better readability\n",
+        "plt.xticks(rotation=45, ha='right')  \n",
         "plt.legend(title='Crime Type Group')\n",
         "plt.grid(axis='y', linestyle='--', alpha=0.7)\n",
         "plt.tight_layout()\n",
-        "plt.show()\n"
+        "plt.show()"
       ],
-      "id": "f5b82077",
+      "id": "25a24c1d",
       "execution_count": null,
       "outputs": []
     },
@@ -780,50 +813,100 @@
       "cell_type": "markdown",
       "metadata": {},
       "source": [
-        "#Aggregated time series"
+        "Geopandas Timeseries\n"
       ],
-      "id": "044c7337"
+      "id": "aa719fac"
     },
     {
       "cell_type": "code",
       "metadata": {},
       "source": [
-        "import pandas as pd\n",
+        "import geopandas as gpd\n",
         "import matplotlib.pyplot as plt\n",
+        "import pandas as pd\n",
         "\n",
-        "# Load the merged dataset\n",
-        "merged_data_path = r'C:\\Users\\madig\\Documents\\Github\\Year 2024-2025\\final-Project-DAP-II\\Final project\\merged_data.csv'\n",
-        "merged_data = pd.read_csv(merged_data_path)\n",
+        "merged_data = gpd.GeoDataFrame(merged_data)\n",
         "\n",
-        "# Ensure DATE column is in datetime format\n",
-        "merged_data['DATE'] = pd.to_datetime(merged_data['DATE'])\n",
+        "merged_data[\"DATE\"] = pd.to_datetime(merged_data[\"DATE\"])\n",
         "\n",
-        "# Aggregate data by Date across all ZIP codes\n",
-        "all_zip_time_series = merged_data.groupby('DATE').agg(\n",
-        "    total_crime=('Crime Count', 'sum'),  # Sum up crime counts\n",
-        "    avg_temp=('TAVG', 'mean')  # Average temperature\n",
-        ").reset_index()\n",
+        "time_series_data = merged_data.groupby([\"DATE\", \"Crime Type Group\"])[\"Crime Count\"].sum().unstack()\n",
         "\n",
-        "# Plot the time-series\n",
         "plt.figure(figsize=(12, 6))\n",
-        "\n",
-        "# Plot Crime Count\n",
-        "plt.plot(all_zip_time_series['DATE'], all_zip_time_series['total_crime'], label='Total Crime', color='red')\n",
-        "\n",
-        "# Plot Average Temperature\n",
-        "plt.plot(all_zip_time_series['DATE'], all_zip_time_series['avg_temp'], label='Average Temperature (TAVG)', color='blue')\n",
-        "\n",
-        "# Add titles and labels\n",
-        "plt.title('City-Wide Crime and Temperature Trends Over Time', fontsize=16)\n",
-        "plt.xlabel('Date', fontsize=12)\n",
-        "plt.ylabel('Count / Temperature', fontsize=12)\n",
-        "plt.legend()\n",
+        "time_series_data.plot(ax=plt.gca(), marker='o')\n",
+        "plt.title(\"Time Series of Crime Counts by Type\", fontsize=14)\n",
+        "plt.xlabel(\"Date\", fontsize=12)\n",
+        "plt.ylabel(\"Crime Count\", fontsize=12)\n",
+        "plt.legend(title=\"Crime Type Group\")\n",
         "plt.grid(True)\n",
-        "\n",
-        "# Display the plot\n",
+        "plt.tight_layout()\n",
         "plt.show()"
       ],
-      "id": "e5960522",
+      "id": "b76779c9",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Cloropleth Map"
+      ],
+      "id": "0fe14e98"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "from shapely.wkt import loads\n",
+        "\n",
+        "merged_data['geometry'] = merged_data['geometry'].apply(loads)"
+      ],
+      "id": "558a6c87",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "import matplotlib.pyplot as plt\n",
+        "import contextily as ctx\n",
+        "\n",
+        "merged_data = merged_data.set_geometry(\"geometry\")\n",
+        "\n",
+        "if merged_data.crs is None:\n",
+        "    merged_data = merged_data.set_crs(epsg=4326)\n",
+        "merged_data = merged_data.to_crs(epsg=3857)\n",
+        "\n",
+        "fig, ax = plt.subplots(figsize=(12, 8))\n",
+        "\n",
+        "merged_data.plot(\n",
+        "    column=\"TAVG\",\n",
+        "    cmap=\"coolwarm\",\n",
+        "    legend=True,\n",
+        "    alpha=0.6,\n",
+        "    edgecolor=\"black\",\n",
+        "    ax=ax,\n",
+        ")\n",
+        "\n",
+        "\n",
+        "merged_data.plot(\n",
+        "    ax=ax,\n",
+        "    color=\"red\",\n",
+        "    markersize=merged_data[\"Crime Count\"] * 2,\n",
+        "    alpha=0.7,\n",
+        "    label=\"Crime Locations\",\n",
+        ")\n",
+        "\n",
+        "\n",
+        "ctx.add_basemap(ax, source=ctx.providers.CartoDB.Positron)\n",
+        "\n",
+        "plt.title(\"Choropleth Map of Temp with Crime Locations\", fontsize=14)\n",
+        "plt.legend()\n",
+        "plt.tight_layout()\n",
+        "plt.show()"
+      ],
+      "id": "1b018cda",
       "execution_count": null,
       "outputs": []
     },
@@ -844,6 +927,13 @@
         "\n",
         "## Shiny App\n",
         "\n",
+        "![the intensity of crime per zipcode in chicago when temperature is 33](low_temp.png)\n",
+        "\n",
+        "![the intensity of crime per zipcode in chicago when temperature is 69](High_temp.png)\n",
+        "\n",
+        "![the intensity of crime per zipcode in chicago when temperature is 89](extra_high.png)\n",
+        "\n",
+        "as we can see there are certain zipcodes that have a high crime rate regardless but in general as temperature increases the number of zipcodes/neighborhoods that have more crimes also spikes. (meaning the total average of crime rate increases in general)\n",
         "\n",
         "\n",
         "\n",
@@ -860,7 +950,7 @@
         "A global analysis could further enhance the study by assessing whether the relationship between temperature and crime is universal or shaped by cultural and geographic factors. Examining this phenomenon in international settings would provide valuable insights into the broader applicability of our findings and reveal potential variations influenced by societal norms and regional climates.\n",
         "Additionally, incorporating other variables such as humidity, unemployment rates, and urban density could create a more robust and nuanced model. These factors may interact with temperature in complex ways, offering a deeper understanding of the environmental and socio-economic drivers of crime. By expanding this research, we can gain a more thorough understanding of the intersection between climate, public safety, and social behavior, ultimately contributing to more informed policy and crime prevention strategies."
       ],
-      "id": "2ef927c1"
+      "id": "97266e9b"
     }
   ],
   "metadata": {
@@ -868,7 +958,7 @@
       "name": "python3",
       "language": "python",
       "display_name": "Python 3 (ipykernel)",
-      "path": "/Users/jennyzhong/Documents/GitHub/final-Project-DAP-II/myenv/share/jupyter/kernels/python3"
+      "path": "/Users/samarnegahdar/Desktop/Final_project/final-Project-DAP-II/Svenv/share/jupyter/kernels/python3"
     }
   },
   "nbformat": 4,
