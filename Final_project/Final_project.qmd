@@ -10,7 +10,7 @@ format:
       echo: false
 
 ---
-# workflow and team members
+# Workflow and team members
 Genevieve Madigan: Madigan989
 -responsibility: write up and data visualization
 Summer Negahdar: Summer99D
@@ -21,17 +21,23 @@ Jenny Zhong: datapolicypython
 
 ## Introduction and prior articles
 
+# Research Question
+Our project investigates the impact of temperature on crime rates in Chicago, focusing on both violent and non-violent crimes. Specifically, our research question is: How does weather affect the occurrence and types of crimes within specific ZIP codes in Chicago?
+Inspired by a study published in the Journal of Criminal Justice (2015–2021) analyzing the temperature-crime relationship across multiple cities, we extended this work to a different time frame (2010–2015). This allowed us to test the study's conclusions during a period of varying political leadership, economic conditions, and macro trends. Understanding these dynamics can inform public safety strategies and resource allocation in response to climate patterns.
+Prior research, including the temperature-aggression hypothesis (Kahn, Deschenes, and Greenstone, 2009) and routine activity theory (Gottfredson and Hirschi, 1990), shows that environmental factors significantly affect criminal activity. These frameworks suggest higher temperatures may increase aggression, while weather influences daily activities, affecting crime opportunities. 
 
+# Methodology
+To conduct our analysis, we utilized two primary datasets. The crime data was retrieved from the Chicago Data Portal, spanning the years 2004 to 2015. Due to the large size of this dataset, we narrowed our scope to focus on the period from 2010 to 2015 to make the analysis more computationally manageable. Weather data was acquired from the National Oceanic and Atmospheric Administration’s (NOAA) daily summaries, providing average, minimum, and maximum temperatures for the city of Chicago.
+To analyze the spatial relationship between crime and weather data, we mapped latitude and longitude coordinates to ZIP Codes using ZIP Code Tabulation Area (ZCTA) shapefiles from the U.S. Census Bureau’s TIGER/Line database. The data preparation process involved several steps. First, we loaded the ZCTA shapefiles into Python as GeoDataFrames using the geopandas library and reprojected them to the EPSG:4326 coordinate system to ensure compatibility with the datasets.
+Next, latitude and longitude values from the crime and weather datasets were converted into shapely.geometry.Point objects to create geospatial geometries. To address precision issues near ZCTA boundaries, small buffers were applied to these points, which slightly expanded their spatial coverage. This step improved the accuracy of subsequent spatial joins by reducing mismatches caused by minor spatial discrepancies.
+Finally, a spatial join was performed using the gpd.sjoin() function to map each point to its corresponding ZCTA polygon. These ZCTAs were then translated into ZIP Codes, allowing us to align the crime and weather data spatially for analysis. This process ensured that each data point was correctly associated with its geographical context, enabling a robust examination of the relationship between temperature and crime across Chicago.
 
+# Challenges
+The crime dataset initially posed significant challenges due to its size, totaling approximately 30GB. This required substantial computational resources for processing and analysis. To address this, we reduced the analysis time frame to 2010–2015, which decreased the dataset size to 13GB. While this adjustment made the dataset more manageable, it still presented difficulties in terms of sharing and processing efficiently. Additionally, to visualize the data and build a functional Shiny app, we had to sample only 1% of the dataset to ensure the app could handle the data volume without performance issues.
+Geospatial analysis introduced further complexities. Mapping latitude and longitude coordinates to ZIP Codes required intensive computations, particularly when working with large datasets. Loading geographic centroids and resolving mismatches during spatial joins added delays to the workflow, highlighting the challenges of working with spatial data at this scale.
+Another issue we encountered was standardizing date formats across the crime and weather datasets. These inconsistencies necessitated additional preprocessing to align timeframes accurately, ensuring that the data could be integrated seamlessly for analysis. This step was critical to maintaining the temporal consistency required for our study.
 
-## Data Cleaning
-
-To Jenny and Gena: 
-things we need to do:
-1. upload temp app,
-
-
-# Load your CSV file
+## Methodology with codes 
 # Crime data: Merging crime data together and merging crime data with ZIP Code
 1. Loading data together
 ```{python}
@@ -41,7 +47,7 @@ import pandas as pd
 from shapely.geometry import Point
 ```
 
-After the presentation, we decided that we would shorten our datasets to 2010 - 2015 so it would be easier to load into our laptops. Subsequently, the code we have accommodates this change below. 
+As mentioned above, after the presentation, we decided that we would shorten our datasets to 2010 - 2015 so it would be easier to load into our laptops. Subsequently, the code we have accommodates this change below. 
 
 First, we load the CSV datasets into dataframes into python
 ```{python}
@@ -353,8 +359,6 @@ merged_data.to_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Projec
 
 ```
 
-
-
 #Now that the data is filtered lets make the two charts
 #BarChart
 
@@ -444,3 +448,14 @@ plt.show()
 
 
 
+## Policy Implications 
+
+Our findings demonstrate a positive correlation between temperature and violent crime rates, aligning with prior research on the relationship between environmental factors and criminal activity. This connection underscores the importance of understanding how temperature fluctuations influence public behavior and safety.
+From a public safety perspective, this insight allows police departments to better anticipate “busy seasons” for violent crimes, particularly during warmer months. With this knowledge, law enforcement agencies can optimize resource allocation, ensuring adequate staffing and preparation to handle increased workloads effectively.
+Additionally, the implications extend to the broader context of climate change. As global temperatures continue to rise, it becomes increasingly critical to assess and address the potential impacts on public safety. Policymakers can use this information to formulate strategies that mitigate the risks associated with climate-induced changes in crime patterns, contributing to more resilient urban environments.
+
+## Directions for Future Work
+
+To broaden the scope and applicability of our findings, future research should expand the analysis to other American cities. This would help determine whether the patterns observed in Chicago are consistent across different urban contexts, offering a more comprehensive understanding of how temperature impacts crime in diverse environments.
+A global analysis could further enhance the study by assessing whether the relationship between temperature and crime is universal or shaped by cultural and geographic factors. Examining this phenomenon in international settings would provide valuable insights into the broader applicability of our findings and reveal potential variations influenced by societal norms and regional climates.
+Additionally, incorporating other variables such as humidity, unemployment rates, and urban density could create a more robust and nuanced model. These factors may interact with temperature in complex ways, offering a deeper understanding of the environmental and socio-economic drivers of crime. By expanding this research, we can gain a more thorough understanding of the intersection between climate, public safety, and social behavior, ultimately contributing to more informed policy and crime prevention strategies.
