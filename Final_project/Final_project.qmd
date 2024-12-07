@@ -3,11 +3,15 @@
 title: "DAP II:Final Project"
 author: "Genevieve Madigan, Summer Negahdar, Jenny Zhong"
 date: "Fall 2024"
-format: html
+format: 
+  html:
+    default-code-block-options:
+      eval: true
+      echo: false
 
 ---
 # workflow and team members
-Genevieve Madigan: #write your github Id here: 
+Genevieve Madigan: Madigan989
 -responsibility: write up and data visualization
 Summer Negahdar: Summer99D
 -responsibility: creation of shiny app and data visualization
