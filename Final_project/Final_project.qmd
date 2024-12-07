@@ -6,7 +6,7 @@ date: "Fall 2024"
 format: 
   html:
     default-code-block-options:
-      eval: true  # Code will not be executed, no output from it
+      eval: false 
       echo: false 
       
 ---
