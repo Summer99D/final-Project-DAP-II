@@ -52,9 +52,6 @@ import numpy as np
 import shiny
 ```
 
-
-```
-
 As mentioned above, after the presentation, we decided that we would shorten our datasets to 2010 - 2015 so it would be easier to load into our laptops. Subsequently, the code we have accommodates this change below. 
 
 First, we load the CSV datasets into dataframes into python
@@ -69,20 +66,11 @@ Then we examine the columns of crime data
 print("2010 Columns:", crimes10.columns)
 ```
 
-We then merge the datasets together so we have a crime rate dataset from 2010 - 2015 
+We then merge the datasets together so we have a crime rate dataset from 2010 - 2015 and examine it.
 ```{python}
 totalcrimedata = pd.concat([crimes2010, crimes1112, crimes131415])
-``` 
-
-We then want to examine the merged dataset
-```{python}
 print(totalcrimedata.info())
-```
-
-This ensures that all years exist
-```{python}
-print(totalcrimedata['Year'].value_counts())
-```
+``` 
 
 Summary statistics for numerical columns 
 ```{python}
