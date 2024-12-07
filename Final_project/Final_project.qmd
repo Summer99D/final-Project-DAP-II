@@ -37,30 +37,31 @@ import pandas as pd
 from shapely.geometry import Point
 ```
 
-After the presentation, we decided that we would shorten our datasets to 2010 - 2015. Subsequently, the code we have accommodates that below. 
+After the presentation, we decided that we would shorten our datasets to 2010 - 2015 so it would be easier to load into our laptops. Subsequently, the code we have accommodates this change below. 
+
+First, we load the CSV datasets into dataframes into python
 ```{python}
 crimes10 = pd.read_csv('Crimes2010.csv')
 crimes1112 = pd.read_csv('Crimes20112012.csv')
 crimes131415 = pd.read_csv('Crimes201320142015.csv')
 ```
 
-2. Examining the columns of crime data 
+Then we examine the columns of crime data 
 ```{python}
 print("2010 Columns:", crimes10.columns)
 ```
 
-3. Merging all datasets together
+We then merge the datasets together so we have a crime rate dataset from 2010 - 2015 
 ```{python}
 totalcrimedata = pd.concat([crimes2010, crimes1112, crimes131415])
 ``` 
 
-Examining the merged dataset
+We then want to examine the merged dataset
 ```{python}
 print(totalcrimedata.info())
 ```
 
-
-Whether all years exist
+This ensures that all years exist
 ```{python}
 print(totalcrimedata['Year'].value_counts())
 ```
@@ -70,22 +71,18 @@ Summary statistics for numerical columns
 print(totalcrimedata.describe())
 ```
 
-Converting latitude and longitude to ZIP Codes
-```{python}
-len(totalcrimedata)
-```
-
+# Now we will convert the longitude and latitude in the crime data into ZIP Code by using an external shapefile and cross referencing this shapefule with our crime dataset
 Load ZIP code shapefiles
 ```{python}
 zip_shapes = gpd.read_file("/Users/jennyzhong/Documents/GitHub/final-Project-DAP-II/ZIP Code Shapefiles/tl_2015_us_zcta510.shp")
 ```
 
+Here, we are transforming spatial data into a consistent coordinate reference system (EPSG:4326), creating geometric points from longitude and latitude, and combining this data into a GeoDataFrame for spatial analysis.
 ```{python}
 zip_shapes = zip_shapes.to_crs("EPSG:4326")
 print(zip_shapes.head())
 ```
 
-crime geometry
 ```{python}
 geometry = [Point(xy) for xy in zip(totalcrimedata['Longitude'], totalcrimedata['Latitude'])]
 ```
@@ -95,20 +92,16 @@ crime_gdf = gpd.GeoDataFrame(totalcrimedata, geometry=geometry, crs="EPSG:4326")
 print(crime_gdf.head())
 ```
 
+Then we are creating buffer zones around each geometry point in crime_gdf with a radius of 0.01 units, modifying the geometry column to reflect these expanded areas.
 ```{python}
 crime_gdf['geometry'] = crime_gdf.geometry.buffer(0.01)
 ```
 
-Merging two data sets
+We are then performing a spatial join to match crime_gdf (containing crime data) with zip_shapes based on their spatial intersection, and saving the resulting data to a CSV file.
 ```{python}
 matched_data = gpd.sjoin(crime_gdf, zip_shapes, how="left", predicate="intersects")
 
-# matched_data.to_csv("filtered_crime_data.csv", index=False)
-```
-
-Clean data
-```{python}
-matched_data.drop(columns=['ID', 'District', 'Community Area', 'CLASSFP10', 'MTFCC10', 'FUNCSTAT10', 'ALAND10', 'AWATER10', 'FBI Code', 'Updated On', 'GEOID10'], inplace=True)
+matched_data.to_csv("filtered_crime_data.csv", index=False)
 ```
 
 Operate from CSV file
@@ -123,20 +116,18 @@ matched_data.drop(columns=['ID', 'District', 'Community Area', 'CLASSFP10', 'MTF
 print(matched_data.head())
 ```
 
+Convert the Date column to a datetime format
 ```{python}
 matched_data['Date'] = pd.to_datetime(matched_data['Date'], errors='coerce')
 ```
 
+Create new columns (YearMonthDay and Time) to separately store the date and time components of the Date column. 
 ```{python}
 matched_data['YearMonthDay'] = matched_data['Date'].dt.date
 matched_data['Time'] = matched_data['Date'].dt.time
 ```
 
-```{python}
-matched_data.drop(columns=['Date', 'Time', 'GEOID10', 'CLASSFP10', 'MTFCC10', 'FUNCSTAT10', 'ALAND10', 'AWATER10', 'Updated On', 'FBI Code'], inplace=True)
-matched_data.head(5)
-```
-
+Rearrange the columns to place YearMonthDay immediately after Case Number for better organization
 ```{python}
 columns = matched_data.columns.tolist()
 columns.remove('YearMonthDay')
@@ -145,13 +136,14 @@ matched_data = matched_data[columns]
 print(matched_data.columns)
 ```
 
+Save the cleaned and restructured data to a CSV file
 ```{python}
 matched_data.to_csv("filtered_crime_data.csv", index=False)
 ```
 
 # Merging weather data together and merging weather data with ZIP code 
 
-Merging all datasets together
+Merging all 2010 - 2015 datasets together. The process is similar to the above. 
 ```{python}
 weather2010 = pd.read_csv('AT2010.csv')
 weather2011 = pd.read_csv('AT2011.csv')
@@ -207,11 +199,13 @@ Loading CSV file
 weatherfinal = pd.read_csv('/Users/jennyzhong/Documents/GitHub/final-Project-DAP-II/Final project/Weather_Data/weather_with_zip.csv')
 ```
 
+Dropping unnecessary columns
 ```{python}
 weatherfinal.head(10)
 weatherfinal = weatherfinal.drop(columns=['TMAX', 'TMIN', 'ELEVATION', 'index_right'])
 ```
 
+Saving to a CSV file 
 ```{python}
 weatherfinal.to_csv('/Users/jennyzhong/Documents/GitHub/final-Project-DAP-II/Final project/Weather_Data/weatherfinal_cleaned.csv', index=False)
 ```
