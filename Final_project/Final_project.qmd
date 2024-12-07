@@ -8,8 +8,9 @@ date: "Fall 2024"
 format: 
   html:
     default-code-block-options:
-      eval: true
       echo: false
+execute:
+  freeze: true
 ---
 
 # Workflow and team members
@@ -62,182 +63,166 @@ As mentioned above, after the presentation, we decided that we would shorten our
 First, we load the CSV datasets into dataframes into python
 
 ```{python}
-crimes10 = pd.read_csv('Crimes2010.csv')
-crimes1112 = pd.read_csv('Crimes20112012.csv')
-crimes131415 = pd.read_csv('Crimes201320142015.csv')
+#crimes10 = pd.read_csv('Crimes2010.csv')
+#crimes1112 = pd.read_csv('Crimes20112012.csv')
+#crimes131415 = pd.read_csv('Crimes201320142015.csv')
 ```
 
 Then we examine the columns of crime data 
 
 ```{python}
-print("2010 Columns:", crimes10.columns)
+#print("2010 Columns:", crimes10.columns)
 ```
 
 We then merge the datasets together so we have a crime rate dataset from 2010 - 2015 and examine it.
 
 ```{python}
-totalcrimedata = pd.concat([crimes2010, crimes1112, crimes131415])
-print(totalcrimedata.info())
+#totalcrimedata = pd.concat([crimes2010, crimes1112, crimes131415])
+#print(totalcrimedata.info())
 ``` 
 
 Summary statistics for numerical columns 
 ```{python}
-print(totalcrimedata.describe())
+#print(totalcrimedata.describe())
 ```
 
 # Now we will convert the longitude and latitude in the crime data into ZIP Code by using an external shapefile and cross referencing this shapefile with our crime dataset
 Load ZIP code shapefiles
 ```{python}
-zip_shapes = gpd.read_file("/Users/jennyzhong/Documents/GitHub/final-Project-DAP-II/ZIP Code Shapefiles/tl_2015_us_zcta510.shp")
+#zip_shapes = gpd.read_file("/Users/jennyzhong/Documents/GitHub/final-Project-DAP-II/ZIP Code Shapefiles/tl_2015_us_zcta510.shp")
 ```
 
 Here, we are transforming spatial data into a consistent coordinate reference system (EPSG:4326), creating geometric points from longitude and latitude, and combining this data into a GeoDataFrame for spatial analysis.
 ```{python}
-zip_shapes = zip_shapes.to_crs("EPSG:4326")
-print(zip_shapes.head())
+#zip_shapes = zip_shapes.to_crs("EPSG:4326")
+#print(zip_shapes.head())
 ```
 
 ```{python}
-geometry = [Point(xy) for xy in zip(totalcrimedata['Longitude'], totalcrimedata['Latitude'])]
+#geometry = [Point(xy) for xy in zip(totalcrimedata['Longitude'], totalcrimedata['Latitude'])]
 ```
 
 ```{python}
-crime_gdf = gpd.GeoDataFrame(totalcrimedata, geometry=geometry, crs="EPSG:4326") 
-print(crime_gdf.head())
+#crime_gdf = gpd.GeoDataFrame(totalcrimedata, geometry=geometry, crs="EPSG:4326") 
+#print(crime_gdf.head())
 ```
 
 Then we are creating buffer zones around each geometry point in crime_gdf with a radius of 0.01 units, modifying the geometry column to reflect these expanded areas.
 ```{python}
-crime_gdf['geometry'] = crime_gdf.geometry.buffer(0.01)
+#crime_gdf['geometry'] = crime_gdf.geometry.buffer(0.01)
 ```
 
 We are then performing a spatial join to match crime_gdf (containing crime data) with zip_shapes based on their spatial intersection, and saving the resulting data to a CSV file.
 ```{python}
-matched_data = gpd.sjoin(crime_gdf, zip_shapes, how="left", predicate="intersects")
+#matched_data = gpd.sjoin(crime_gdf, zip_shapes, how="left", predicate="intersects")
 
-matched_data.to_csv("filtered_crime_data.csv", index=False)
+#matched_data.to_csv("filtered_crime_data.csv", index=False)
 ```
 
 Operate from CSV file
 ```{python}
-matched_data = pd.read_csv("filtered_crime_data.csv")
-print(matched_data.head())
+#matched_data = pd.read_csv("filtered_crime_data.csv")
+#print(matched_data.head())
 ```
 
 Drop appropriate columns 
 ```{python}
-matched_data.drop(columns=['ID', 'District', 'Community Area', 'CLASSFP10', 'MTFCC10', 'FUNCSTAT10', 'ALAND10', 'AWATER10', 'FBI Code', 'Updated On', 'GEOID10'], inplace=True)
-print(matched_data.head())
+#matched_data.drop(columns=['ID', 'District', 'Community Area', 'CLASSFP10', 'MTFCC10', 'FUNCSTAT10', 'ALAND10', 'AWATER10', 'FBI Code', 'Updated On', 'GEOID10'], inplace=True)
+#print(matched_data.head())
 ```
 
 Convert the Date column to a datetime format
 ```{python}
-matched_data['Date'] = pd.to_datetime(matched_data['Date'], errors='coerce')
+#matched_data['Date'] = pd.to_datetime(matched_data['Date'], errors='coerce')
 ```
 
 Create new columns (YearMonthDay and Time) to separately store the date and time components of the Date column. 
 ```{python}
-matched_data['YearMonthDay'] = matched_data['Date'].dt.date
-matched_data['Time'] = matched_data['Date'].dt.time
+#matched_data['YearMonthDay'] = matched_data['Date'].dt.date
+#matched_data['Time'] = matched_data['Date'].dt.time
 ```
 
 Rearrange the columns to place YearMonthDay immediately after Case Number for better organization
 ```{python}
-columns = matched_data.columns.tolist()
-columns.remove('YearMonthDay')
-columns.insert(columns.index('Case Number') + 1, 'YearMonthDay')
-matched_data = matched_data[columns]
-print(matched_data.columns)
+#columns = matched_data.columns.tolist()
+#columns.remove('YearMonthDay')
+#columns.insert(columns.index('Case Number') + 1, 'YearMonthDay')
+#matched_data = matched_data[columns]
+#print(matched_data.columns)
 ```
 
 Save the cleaned and restructured data to a CSV file
 ```{python}
-matched_data.to_csv("filtered_crime_data.csv", index=False)
+#matched_data.to_csv("filtered_crime_data.csv", index=False)
 ```
 
 ## Merging weather data together and merging weather data with ZIP code 
 
 Merging all 2010 - 2015 datasets together. The process is similar to the above. 
 ```{python}
-weather2010 = pd.read_csv('AT2010.csv')
-weather2011 = pd.read_csv('AT2011.csv')
-weather2012 = pd.read_csv('AT2012.csv')
-weather2013 = pd.read_csv('AT2013.csv')
-weather2014 = pd.read_csv('AT2014.csv')
-weather2015 = pd.read_csv('AT2015.csv')
+#weather2010 = pd.read_csv('AT2010.csv')
+#weather2011 = pd.read_csv('AT2011.csv')
+#weather2012 = pd.read_csv('AT2012.csv')
+#weather2013 = pd.read_csv('AT2013.csv')
+#weather2014 = pd.read_csv('AT2014.csv')
+#weather2015 = pd.read_csv('AT2015.csv')
 ```
 
 ```{python}
-total_weather = pd.concat([weather2010, weather2011, weather2012, weather2013, weather2014, weather2015], ignore_index=True)
+#total_weather = pd.concat([weather2010, weather2011, weather2012, weather2013, weather2014, weather2015], ignore_index=True)
 ```
 
 Convert weather data to geodataframe
 ```{python}
-geometry = [Point(xy) for xy in zip(total_weather['LONGITUDE'], total_weather['LATITUDE'])]
+#geometry = [Point(xy) for xy in zip(total_weather['LONGITUDE'], total_weather['LATITUDE'])]
 
-weather_gdf = gpd.GeoDataFrame(total_weather, geometry=geometry)
+#weather_gdf = gpd.GeoDataFrame(total_weather, geometry=geometry)
 
-weather_gdf.set_crs("EPSG:4326", inplace=True)
+#weather_gdf.set_crs("EPSG:4326", inplace=True)
 
-weather_gdf['geometry'] = weather_gdf.geometry.buffer(0.01)
+#weather_gdf['geometry'] = weather_gdf.geometry.buffer(0.01)
 ```
 
 Load the ZIP Code Shapefile
 ```{python}
-zip_shapefile = gpd.read_file('/Users/jennyzhong/Documents/GitHub/final-Project-DAP-II/ZIP_Code_Shapefiles/tl_2015_us_zcta510.shp')
+#zip_shapefile = gpd.read_file('/Users/jennyzhong/Documents/GitHub/final-Project-DAP-II/ZIP_Code_Shapefiles/tl_2015_us_zcta510.shp')
 
-zip_shapefile = zip_shapefile.to_crs("EPSG:4326")
+#zip_shapefile = zip_shapefile.to_crs("EPSG:4326")
 ```
 
 Spatial join to match the zip codes
 ```{python}
-weather_with_zip = gpd.sjoin(weather_gdf, zip_shapefile, how='left', predicate='intersects')
+#weather_with_zip = gpd.sjoin(weather_gdf, zip_shapefile, how='left', predicate='intersects')
 
-print(weather_with_zip.head())
+#print(weather_with_zip.head())
 ```
 
 Drop irrelevant dataframes: 
 ```{python}
-weather_with_zip.drop(["CLASSFP10", "MTFCC10", "FUNCSTAT10", "ALAND10", "AWATER10", "GEOID10"], axis=1, inplace=True)
+#weather_with_zip.drop(["CLASSFP10", "MTFCC10", "FUNCSTAT10", "ALAND10", "AWATER10", "GEOID10"], axis=1, inplace=True)
 
-print(weather_with_zip)
+#print(weather_with_zip)
 ```
 
 Final CSV file for weather 
 ```{python}
-weather_with_zip.to_csv("weather_with_zip.csv", index=False)
+#weather_with_zip.to_csv("weather_with_zip.csv", index=False)
 ```
 
 Loading CSV file 
 ```{python}
-weatherfinal = pd.read_csv('/Users/jennyzhong/Documents/GitHub/final-Project-DAP-II/Final project/Weather_Data/weather_with_zip.csv')
+#weatherfinal = pd.read_csv('/Users/jennyzhong/Documents/GitHub/final-Project-DAP-II/Final project/Weather_Data/weather_with_zip.csv')
 ```
 
 Dropping unnecessary columns
 ```{python}
-weatherfinal.head(10)
-weatherfinal = weatherfinal.drop(columns=['TMAX', 'TMIN', 'ELEVATION', 'index_right'])
+#weatherfinal.head(10)
+#weatherfinal = weatherfinal.drop(columns=['TMAX', 'TMIN', 'ELEVATION', 'index_right'])
 ```
 
 Saving to a CSV file 
 ```{python}
-weatherfinal.to_csv('/Users/jennyzhong/Documents/GitHub/final-Project-DAP-II/Final project/Weather_Data/weather_raw.csv', index=False)
-```
-
-
-
-
-```{python}
-##installing the necessary packages
-import pandas as pd
-import matplotlib.pyplot as plt
-import altair as alt
-import numpy as np
-import geopandas as gpd
-import shapely
-import shiny
-#from shapely.geometry import Point
-#import pgeocode
+#weatherfinal.to_csv('/Users/jennyzhong/Documents/GitHub/final-Project-DAP-II/Final project/Weather_Data/weather_raw.csv', index=False)
 ```
 
 
@@ -253,17 +238,17 @@ import shiny
 
 ```{python}
 ##installing the necessary packages
-import pandas as pd
-import matplotlib.pyplot as plt
-import altair as alt
-import numpy as np
-import geopandas as gpd
-import shapely
-import shiny
+#import pandas as pd
+#import matplotlib.pyplot as plt
+#import altair as alt
+#import numpy as np
+#import geopandas as gpd
+#import shapely
+#import shiny
 
 
-from shapely.geometry import Point
-import matplotlib.pyplot as plt
+#from shapely.geometry import Point
+#import matplotlib.pyplot as plt
 
 #from shapely.geometry import Point
 #import pgeocode
@@ -301,70 +286,67 @@ Crime data grouping and removing unneccesary columns
 And making a function to group crime types
 
 ```{python}
-filtered_weather_data = pd.read_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\Final project\weatherfinal_cleaned.csv')
-filtered_crime_data = pd.read_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\Final project\filtered_crime_data.csv')
+
+#filtered_weather_data = pd.read_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\Final project\weatherfinal_cleaned.csv')
+#filtered_crime_data = pd.read_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\Final project\filtered_crime_data.csv')
 ```
 
 
 ```{python}
+#unique_primary_types = filtered_crime_data['Primary Type'].unique()
 
-unique_primary_types = filtered_crime_data['Primary Type'].unique()
+#def categorize_crime(crime_type):
+    #if crime_type in ['BATTERY', 'ASSAULT', 'ROBBERY', 'SEX OFFENSE', 
+                      #'CRIM SEXUAL ASSAULT', 'CRIMINAL SEXUAL ASSAULT', 
+                      #'HOMICIDE', 'KIDNAPPING', 'STALKING', 'INTIMIDATION']:
+        #return 'Violent Crimes'
+    #elif crime_type in ['MOTOR VEHICLE THEFT', 'THEFT', 'BURGLARY', 
+                        #'CRIMINAL DAMAGE', 'ARSON', 'CRIMINAL TRESPASS']:
+        #return 'Property Crimes'
+    #elif crime_type in ['WEAPONS VIOLATION', 'PUBLIC PEACE VIOLATION', 
+                        #'LIQUOR LAW VIOLATION', 'OBSCENITY', 
+                        #'PUBLIC INDECENCY', 'CONCEALED CARRY LICENSE VIOLATION']:
+       # return 'Public Order and Regulatory Violations'
+    #else:
+        #return 'Other Offenses'
 
-def categorize_crime(crime_type):
-    if crime_type in ['BATTERY', 'ASSAULT', 'ROBBERY', 'SEX OFFENSE', 
-                      'CRIM SEXUAL ASSAULT', 'CRIMINAL SEXUAL ASSAULT', 
-                      'HOMICIDE', 'KIDNAPPING', 'STALKING', 'INTIMIDATION']:
-        return 'Violent Crimes'
-    elif crime_type in ['MOTOR VEHICLE THEFT', 'THEFT', 'BURGLARY', 
-                        'CRIMINAL DAMAGE', 'ARSON', 'CRIMINAL TRESPASS']:
-        return 'Property Crimes'
-    elif crime_type in ['WEAPONS VIOLATION', 'PUBLIC PEACE VIOLATION', 
-                        'LIQUOR LAW VIOLATION', 'OBSCENITY', 
-                        'PUBLIC INDECENCY', 'CONCEALED CARRY LICENSE VIOLATION']:
-        return 'Public Order and Regulatory Violations'
-    else:
-        return 'Other Offenses'
+#filtered_crime_data['Crime Type Group'] = filtered_crime_data['Primary Type'].apply(categorize_crime)
 
-filtered_crime_data['Crime Type Group'] = filtered_crime_data['Primary Type'].apply(categorize_crime)
+#columns_to_drop = [
+    #'YearMonthDay', 'Block', 'IUCR', 'Primary Type', 'Description',
+    #'Location Description', 'Arrest', 'Domestic', 'Beat', 'Ward',
+    #'FBI Code', 'X Coordinate', 'Y Coordinate', 'Year', 'Location',
+    #'ID', 'District', 'Community Area', 'index_right', 'INTPTLAT10', 
+    #'INTPTLON10'
+#]
 
-columns_to_drop = [
-    'YearMonthDay', 'Block', 'IUCR', 'Primary Type', 'Description',
-    'Location Description', 'Arrest', 'Domestic', 'Beat', 'Ward',
-    'FBI Code', 'X Coordinate', 'Y Coordinate', 'Year', 'Location',
-    'ID', 'District', 'Community Area', 'index_right', 'INTPTLAT10', 
-    'INTPTLON10'
-]
+#filtered_crime_data = filtered_crime_data.drop(columns=columns_to_drop)
 
-filtered_crime_data = filtered_crime_data.drop(columns=columns_to_drop)
+#filtered_crime_data = filtered_crime_data.dropna(subset=['ZCTA5CE10'])
+#filtered_crime_data['ZCTA5CE10'] = filtered_crime_data['ZCTA5CE10'].astype(int)
 
-filtered_crime_data = filtered_crime_data.dropna(subset=['ZCTA5CE10'])
-filtered_crime_data['ZCTA5CE10'] = filtered_crime_data['ZCTA5CE10'].astype(int)
+#filtered_crime_data.rename(columns={'ZCTA5CE10': 'ZIP_CODE'}, inplace=True)
 
-filtered_crime_data.rename(columns={'ZCTA5CE10': 'ZIP_CODE'}, inplace=True)
-
-print(filtered_crime_data.head())
+#print(filtered_crime_data.head())
 ```
 
 Merging two datasets (crime and weather) by Zipcode and Date column.
 
 ```{python}
+#filtered_crime_data['DATE'] = pd.to_datetime(filtered_crime_data['DATE'])
+#filtered_weather_data['DATE'] = pd.to_datetime(filtered_weather_data['DATE'])
 
-filtered_crime_data['DATE'] = pd.to_datetime(filtered_crime_data['DATE'])
-filtered_weather_data['DATE'] = pd.to_datetime(filtered_weather_data['DATE'])
-
-crime_summary = filtered_crime_data.groupby(['DATE', 'ZIP_CODE', 'Crime Type Group']).size().reset_index(name='Crime Count')
+#crime_summary = filtered_crime_data.groupby(['DATE', 'ZIP_CODE', 'Crime Type Group']).size().reset_index(name='Crime Count')
 
 
-merged_data = pd.merge(
-    crime_summary,
-    filtered_weather_data[['DATE', 'ZIP_CODE', 'TAVG', 'geometry']],  # Select relevant weather columns
-    on=['DATE', 'ZIP_CODE'],
-    how='inner'  # Use 'inner' to match rows in both datasets
-)
+#merged_data = pd.merge(crime_summary,
+    #filtered_weather_data[['DATE', 'ZIP_CODE', 'TAVG', 'geometry']], 
+    #on=['DATE', 'ZIP_CODE'],
+    #how='inner')
 
-print(merged_data.head())
+#print(merged_data.head())
 
-merged_data.to_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\Final project\merged_data.csv', index=False)
+#merged_data.to_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\Final project\merged_data.csv', index=False)
 
 ```
 
@@ -375,110 +357,104 @@ Now that the data is filtered lets make the two charts
 BarChart:
 
 ```{python}
-import pandas as pd
-import matplotlib.pyplot as plt
+#import pandas as pd
+#import matplotlib.pyplot as plt
 
-filtered_weather_data['TAVG_bin'] = pd.cut(
-    filtered_weather_data['TAVG'], 
-    bins=range(int(filtered_weather_data['TAVG'].min()) // 15 * 15, 
-               int(filtered_weather_data['TAVG'].max()) // 15 * 15 + 15, 
-               15), 
-    right=False
-)
+#filtered_weather_data['TAVG_bin'] = pd.cut(
+    #filtered_weather_data['TAVG'], 
+    #bins=range(int(filtered_weather_data['TAVG'].min()) // 15 * 15, 
+               #int(filtered_weather_data['TAVG'].max()) // 15 * 15 + 15, 15), 
+   # right=False
+#)
 
-merged_data_with_bins = pd.merge(
-    merged_data,
-    filtered_weather_data[['DATE', 'TAVG_bin']], 
-    on='DATE',
-    how='left'
-)
+#merged_data_with_bins = pd.merge(merged_data, filtered_weather_data[['DATE', 'TAVG_bin']], on='DATE',how='left')
 
-crime_distribution = merged_data_with_bins.groupby(['TAVG_bin', 'Crime Type Group'])['Crime Count'].sum().unstack(fill_value=0)
+#crime_distribution = merged_data_with_bins.groupby(['TAVG_bin', 'Crime Type Group'])['Crime Count'].sum().unstack(fill_value=0)
 
-crime_distribution.plot(kind='bar', stacked=True, figsize=(12, 7), width=0.9)
-plt.title('Crime Distribution by Temperature Range (Binned by 15)')
-plt.xlabel('Temperature Range (°F)')
-plt.ylabel('Total Crime Count')
-plt.xticks(rotation=45, ha='right')  
-plt.legend(title='Crime Type Group')
-plt.grid(axis='y', linestyle='--', alpha=0.7)
-plt.tight_layout()
-plt.show()
+#crime_distribution.plot(kind='bar', stacked=True, figsize=(12, 7), width=0.9)
+#plt.title('Crime Distribution by Temperature Range (Binned by 15)')
+#plt.xlabel('Temperature Range (°F)')
+#plt.ylabel('Total Crime Count')
+#plt.xticks(rotation=45, ha='right')  
+#plt.legend(title='Crime Type Group')
+#plt.grid(axis='y', linestyle='--', alpha=0.7)
+#plt.tight_layout()
+#plt.show()
 
 ```
 
 Geopandas Timeseries
 
 ```{python}
-import geopandas as gpd
-import matplotlib.pyplot as plt
-import pandas as pd
+#import geopandas as gpd
+#import matplotlib.pyplot as plt
+#import pandas as pd
 
-merged_data = gpd.GeoDataFrame(merged_data)
+#merged_data = gpd.GeoDataFrame(merged_data)
 
-merged_data["DATE"] = pd.to_datetime(merged_data["DATE"])
+#merged_data["DATE"] = pd.to_datetime(merged_data["DATE"])
 
-time_series_data = merged_data.groupby(["DATE", "Crime Type Group"])["Crime Count"].sum().unstack()
+#time_series_data = merged_data.groupby(["DATE", "Crime Type Group"])["Crime Count"].sum().unstack()
 
-plt.figure(figsize=(12, 6))
-time_series_data.plot(ax=plt.gca(), marker='o')
-plt.title("Time Series of Crime Counts by Type", fontsize=14)
-plt.xlabel("Date", fontsize=12)
-plt.ylabel("Crime Count", fontsize=12)
-plt.legend(title="Crime Type Group")
-plt.grid(True)
-plt.tight_layout()
-plt.show()
+#plt.figure(figsize=(12, 6))
+#time_series_data.plot(ax=plt.gca(), marker='o')
+#plt.title("Time Series of Crime Counts by Type", fontsize=14)
+#plt.xlabel("Date", fontsize=12)
+#plt.ylabel("Crime Count", fontsize=12)
+#plt.legend(title="Crime Type Group")
+#plt.grid(True)
+#plt.tight_layout()
+#plt.show()
 
 ```
 
 
 Cloropleth Map
 ```{python}
-from shapely.wkt import loads
+#from shapely.wkt import loads
 
-merged_data['geometry'] = merged_data['geometry'].apply(loads)
+#merged_data['geometry'] = merged_data['geometry'].apply(loads)
 
 ```
 
 
 ```{python}
-import matplotlib.pyplot as plt
-import contextily as ctx
+#import matplotlib.pyplot as plt
+#import contextily as ctx
 
-merged_data = merged_data.set_geometry("geometry")
+#merged_data = merged_data.set_geometry("geometry")
 
-if merged_data.crs is None:
-    merged_data = merged_data.set_crs(epsg=4326)
-merged_data = merged_data.to_crs(epsg=3857)
+#if merged_data.crs is None:
+    #merged_data = merged_data.set_crs(epsg=4326)
+#merged_data = merged_data.to_crs(epsg=3857)
 
-fig, ax = plt.subplots(figsize=(12, 8))
+#fig, ax = plt.subplots(figsize=(12, 8))
 
-merged_data.plot(
-    column="TAVG",
-    cmap="coolwarm",
-    legend=True,
-    alpha=0.6,
-    edgecolor="black",
-    ax=ax,
-)
-
-
-merged_data.plot(
-    ax=ax,
-    color="red",
-    markersize=merged_data["Crime Count"] * 2,
-    alpha=0.7,
-    label="Crime Locations",
-)
+#merged_data.plot(
+    #column="TAVG",
+    #cmap="coolwarm",
+    #legend=True,
+    #alpha=0.6,
+    #edgecolor="black",
+    #ax=ax,
+#)
 
 
-ctx.add_basemap(ax, source=ctx.providers.CartoDB.Positron)
+#merged_data.plot(
+    #ax=ax,
+    #color="red",
+    #markersize=merged_data["Crime Count"] * 2,
+   # alpha=0.7,
+    #label="Crime Locations",
+#)
 
-plt.title("Choropleth Map of Temp with Crime Locations", fontsize=14)
-plt.legend()
-plt.tight_layout()
-plt.show()
+
+#ctx.add_basemap(ax, source=ctx.providers.CartoDB.Positron)
+
+#plt.title("Choropleth Map of Temp with Crime Locations", fontsize=14)
+#plt.legend()
+#plt.tight_layout()
+#plt.show()
 
 ```
 
