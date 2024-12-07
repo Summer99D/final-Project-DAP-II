@@ -257,6 +257,11 @@ import numpy as np
 import geopandas as gpd
 import shapely
 import shiny
+
+
+from shapely.geometry import Point
+import matplotlib.pyplot as plt
+
 #from shapely.geometry import Point
 #import pgeocode
 ```
@@ -399,35 +404,77 @@ plt.show()
 
 ```
 
+Geopandas Timeseries
 
-#Aggregated time series
 ```{python}
-import pandas as pd
+import geopandas as gpd
 import matplotlib.pyplot as plt
+import pandas as pd
 
-merged_data_path = r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\Final project\merged_data.csv'
-merged_data = pd.read_csv(merged_data_path)
+merged_data = gpd.GeoDataFrame(merged_data)
 
-merged_data['DATE'] = pd.to_datetime(merged_data['DATE'])
+merged_data["DATE"] = pd.to_datetime(merged_data["DATE"])
 
-
-all_zip_time_series = merged_data.groupby('DATE').agg(
-    total_crime=('Crime Count', 'sum'),  
-    avg_temp=('TAVG', 'mean')  
-).reset_index()
+time_series_data = merged_data.groupby(["DATE", "Crime Type Group"])["Crime Count"].sum().unstack()
 
 plt.figure(figsize=(12, 6))
-
-plt.plot(all_zip_time_series['DATE'], all_zip_time_series['total_crime'], label='Total Crime', color='red')
-
-plt.plot(all_zip_time_series['DATE'], all_zip_time_series['avg_temp'], label='Average Temperature (TAVG)', color='blue')
-
-plt.title('City-Wide Crime and Temperature Trends Over Time', fontsize=16)
-plt.xlabel('Date', fontsize=12)
-plt.ylabel('Count / Temperature', fontsize=12)
-plt.legend()
+time_series_data.plot(ax=plt.gca(), marker='o')
+plt.title("Time Series of Crime Counts by Type", fontsize=14)
+plt.xlabel("Date", fontsize=12)
+plt.ylabel("Crime Count", fontsize=12)
+plt.legend(title="Crime Type Group")
 plt.grid(True)
+plt.tight_layout()
+plt.show()
 
+```
+
+
+Cloropleth Map
+```{python}
+from shapely.wkt import loads
+
+merged_data['geometry'] = merged_data['geometry'].apply(loads)
+
+```
+
+
+```{python}
+import matplotlib.pyplot as plt
+import contextily as ctx
+
+merged_data = merged_data.set_geometry("geometry")
+
+if merged_data.crs is None:
+    merged_data = merged_data.set_crs(epsg=4326)
+merged_data = merged_data.to_crs(epsg=3857)
+
+fig, ax = plt.subplots(figsize=(12, 8))
+
+merged_data.plot(
+    column="TAVG",
+    cmap="coolwarm",
+    legend=True,
+    alpha=0.6,
+    edgecolor="black",
+    ax=ax,
+)
+
+
+merged_data.plot(
+    ax=ax,
+    color="red",
+    markersize=merged_data["Crime Count"] * 2,
+    alpha=0.7,
+    label="Crime Locations",
+)
+
+
+ctx.add_basemap(ax, source=ctx.providers.CartoDB.Positron)
+
+plt.title("Choropleth Map of Temp with Crime Locations", fontsize=14)
+plt.legend()
+plt.tight_layout()
 plt.show()
 
 ```
