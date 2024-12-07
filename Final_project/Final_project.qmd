@@ -485,7 +485,7 @@ plt.show()
 
 We explain the following graphs here: 
 
-This bar chart demonstrates crime frequency across temperature ranges, revealing a significant increase in crimes at higher temperatures.
+This bar chart demonstrates crime frequency across temperature ranges, revealing a significant increase in crimes at higher temperatures. This aligns with routine activity theory, as warmer temperatures encourage outdoor activities, potentially increasing encounters between offenders and victims. Conversely, fewer crimes generally occur in colder temperature ranges,, likely due to reduced outdoor activities and interactions.
 ![Graph 1 Description](Graphs/graph1.jpeg)
 
 This chart illustrates the trend of crime occurrences over time, highlighting a noticeable increase during the summer months, suggesting a seasonal pattern in criminal activity.
