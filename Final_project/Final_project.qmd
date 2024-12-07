@@ -510,8 +510,6 @@ here are the photos from the shiny app:
 
 
 
-
-
 ## Policy Implications 
 
 Our findings demonstrate a positive correlation between temperature and violent crime rates, aligning with prior research on the relationship between environmental factors and criminal activity. This connection underscores the importance of understanding how temperature fluctuations influence public behavior and safety.
