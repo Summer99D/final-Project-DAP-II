@@ -488,6 +488,7 @@ We explain the following graphs here:
 ![Graph 2 Description](Graphs/Graph2.jpeg)
 
 
+This choropleth map displays crime locations in Chicago, with points indicating crime occurrences and their color representing the temperature. Red points signify higher temperatures, while blue points indicate lower temperatures. The map shows that red points are more prominent, suggesting that crimes are more frequent during warmer weather. This highlights a possible connection between temperature and crime rates.
 ![Graph 3 Description](Graphs/Graph3.jpeg)
 
 
