@@ -422,6 +422,15 @@ plt.show()
 
 ```
 
+We explain the following graphs here: 
+
+![Graph 1 Description](Graphs/graph1.jpeg)
+
+
+![Graph 2 Description](Graphs/Graph2.jpeg)
+
+
+![Graph 3 Description](Graphs/Graph3.jpeg)
 
 
 ## Shiny App
