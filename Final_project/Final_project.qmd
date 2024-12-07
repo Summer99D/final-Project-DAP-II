@@ -211,7 +211,7 @@ weatherfinal = weatherfinal.drop(columns=['TMAX', 'TMIN', 'ELEVATION', 'index_ri
 
 Saving to a CSV file 
 ```{python}
-weatherfinal.to_csv('/Users/jennyzhong/Documents/GitHub/final-Project-DAP-II/Final project/Weather_Data/weatherfinal_cleaned.csv', index=False)
+weatherfinal.to_csv('/Users/jennyzhong/Documents/GitHub/final-Project-DAP-II/Final project/Weather_Data/weather_raw.csv', index=False)
 ```
 
 # Apply function to your data
