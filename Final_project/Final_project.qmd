@@ -249,6 +249,34 @@ import shiny
 #shrunk the data 
 
 ```{python}
+##installing the necessary packages
+import pandas as pd
+import matplotlib.pyplot as plt
+import altair as alt
+import numpy as np
+import geopandas as gpd
+import shapely
+import shiny
+
+
+from shapely.geometry import Point
+import matplotlib.pyplot as plt
+
+#from shapely.geometry import Point
+#import pgeocode
+```
+
+
+## Data experiment
+
+
+## Data Visualization
+#merging the data
+#For the following data, we decided to filter the information down to 
+#2010-2015 because 30 GB is way too much, the following code is how we 
+#shrunk the data 
+
+```{python}
 #final_crime_data = pd.read_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\final_crime_data.csv')
 #final_weather_data = pd.read_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\final_weather_data.csv')
 ```
@@ -317,14 +345,12 @@ Merging
 
 ```{python}
 
-# Ensure DATE columns are in datetime format
 filtered_crime_data['DATE'] = pd.to_datetime(filtered_crime_data['DATE'])
 filtered_weather_data['DATE'] = pd.to_datetime(filtered_weather_data['DATE'])
 
-# Group the crime data to create a Crime Count column
 crime_summary = filtered_crime_data.groupby(['DATE', 'ZIP_CODE', 'Crime Type Group']).size().reset_index(name='Crime Count')
 
-# Merge the grouped crime summary with the weather data on DATE and ZIP_CODE
+
 merged_data = pd.merge(
     crime_summary,
     filtered_weather_data[['DATE', 'ZIP_CODE', 'TAVG', 'geometry']],  # Select relevant weather columns
@@ -332,23 +358,23 @@ merged_data = pd.merge(
     how='inner'  # Use 'inner' to match rows in both datasets
 )
 
-# Display the first few rows of the merged dataset
 print(merged_data.head())
 
-# Save the merged dataset to a CSV file
 merged_data.to_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\Final project\merged_data.csv', index=False)
-
 
 ```
 
+
+
 #Now that the data is filtered lets make the two charts
+
+
 #BarChart
 
 ```{python}
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# Bin the temperature data into 15-unit ranges
 filtered_weather_data['TAVG_bin'] = pd.cut(
     filtered_weather_data['TAVG'], 
     bins=range(int(filtered_weather_data['TAVG'].min()) // 15 * 15, 
@@ -357,7 +383,6 @@ filtered_weather_data['TAVG_bin'] = pd.cut(
     right=False
 )
 
-# Merge crime and weather data to keep crime group info
 merged_data_with_bins = pd.merge(
     merged_data,
     filtered_weather_data[['DATE', 'TAVG_bin']], 
@@ -365,62 +390,95 @@ merged_data_with_bins = pd.merge(
     how='left'
 )
 
-# Group data by TAVG_bin and Crime Type Group
 crime_distribution = merged_data_with_bins.groupby(['TAVG_bin', 'Crime Type Group'])['Crime Count'].sum().unstack(fill_value=0)
 
-# Plot stacked bar chart
 crime_distribution.plot(kind='bar', stacked=True, figsize=(12, 7), width=0.9)
 plt.title('Crime Distribution by Temperature Range (Binned by 15)')
 plt.xlabel('Temperature Range (°F)')
 plt.ylabel('Total Crime Count')
-plt.xticks(rotation=45, ha='right')  # Rotate x-axis labels for better readability
+plt.xticks(rotation=45, ha='right')  
 plt.legend(title='Crime Type Group')
 plt.grid(axis='y', linestyle='--', alpha=0.7)
 plt.tight_layout()
 plt.show()
 
-
 ```
 
+Geopandas Timeseries
 
-#Aggregated time series
 ```{python}
-import pandas as pd
+import geopandas as gpd
 import matplotlib.pyplot as plt
+import pandas as pd
 
-# Load the merged dataset
-merged_data_path = r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\Final project\merged_data.csv'
-merged_data = pd.read_csv(merged_data_path)
+merged_data = gpd.GeoDataFrame(merged_data)
 
-# Ensure DATE column is in datetime format
-merged_data['DATE'] = pd.to_datetime(merged_data['DATE'])
+merged_data["DATE"] = pd.to_datetime(merged_data["DATE"])
 
-# Aggregate data by Date across all ZIP codes
-all_zip_time_series = merged_data.groupby('DATE').agg(
-    total_crime=('Crime Count', 'sum'),  # Sum up crime counts
-    avg_temp=('TAVG', 'mean')  # Average temperature
-).reset_index()
+time_series_data = merged_data.groupby(["DATE", "Crime Type Group"])["Crime Count"].sum().unstack()
 
-# Plot the time-series
 plt.figure(figsize=(12, 6))
-
-# Plot Crime Count
-plt.plot(all_zip_time_series['DATE'], all_zip_time_series['total_crime'], label='Total Crime', color='red')
-
-# Plot Average Temperature
-plt.plot(all_zip_time_series['DATE'], all_zip_time_series['avg_temp'], label='Average Temperature (TAVG)', color='blue')
-
-# Add titles and labels
-plt.title('City-Wide Crime and Temperature Trends Over Time', fontsize=16)
-plt.xlabel('Date', fontsize=12)
-plt.ylabel('Count / Temperature', fontsize=12)
-plt.legend()
+time_series_data.plot(ax=plt.gca(), marker='o')
+plt.title("Time Series of Crime Counts by Type", fontsize=14)
+plt.xlabel("Date", fontsize=12)
+plt.ylabel("Crime Count", fontsize=12)
+plt.legend(title="Crime Type Group")
 plt.grid(True)
-
-# Display the plot
+plt.tight_layout()
 plt.show()
 
 ```
+
+
+Cloropleth Map
+```{python}
+from shapely.wkt import loads
+
+merged_data['geometry'] = merged_data['geometry'].apply(loads)
+
+```
+
+
+```{python}
+import matplotlib.pyplot as plt
+import contextily as ctx
+
+merged_data = merged_data.set_geometry("geometry")
+
+if merged_data.crs is None:
+    merged_data = merged_data.set_crs(epsg=4326)
+merged_data = merged_data.to_crs(epsg=3857)
+
+fig, ax = plt.subplots(figsize=(12, 8))
+
+merged_data.plot(
+    column="TAVG",
+    cmap="coolwarm",
+    legend=True,
+    alpha=0.6,
+    edgecolor="black",
+    ax=ax,
+)
+
+
+merged_data.plot(
+    ax=ax,
+    color="red",
+    markersize=merged_data["Crime Count"] * 2,
+    alpha=0.7,
+    label="Crime Locations",
+)
+
+
+ctx.add_basemap(ax, source=ctx.providers.CartoDB.Positron)
+
+plt.title("Choropleth Map of Temp with Crime Locations", fontsize=14)
+plt.legend()
+plt.tight_layout()
+plt.show()
+
+```
+
 
 We explain the following graphs here: 
 
