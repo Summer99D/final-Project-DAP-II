@@ -493,6 +493,13 @@ We explain the following graphs here:
 
 ## Shiny App
 
+![the intensity of crime per zipcode in chicago when temperature is 33](low_temp.png)
+
+![the intensity of crime per zipcode in chicago when temperature is 69](High_temp.png)
+
+![the intensity of crime per zipcode in chicago when temperature is 89](extra_high.png)
+
+as we can see there are certain zipcodes that have a high crime rate regardless but in general as temperature increases the number of zipcodes/neighborhoods that have more crimes also spikes. (meaning the total average of crime rate increases in general)
 
 
 
