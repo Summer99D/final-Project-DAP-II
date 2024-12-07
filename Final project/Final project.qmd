@@ -251,6 +251,7 @@ weather_with_zip.to_csv("final_weather_data.csv", index=False)
 ```{python}
 ##installing the necessary packages
 import pandas as pd
+import matplotlib.pyplot as plt
 import altair as alt
 import numpy as np
 import geopandas as gpd
@@ -263,118 +264,113 @@ import shiny
 
 
 ## Data experiment
-```{python}
 
-```
 
 ## Data Visualization
 #merging the data
+#For the following data, we decided to filter the information down to 
+#2010-2015 because 30 GB is way too much, the following code is how we 
+#shrunk the data 
 
 ```{python}
+#final_crime_data = pd.read_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\final_crime_data.csv')
+#final_weather_data = pd.read_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\final_weather_data.csv')
+```
 
-final_crime_data = pd.read_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\final_crime_data.csv')
-final_weather_data = pd.read_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\final_weather_data.csv')
+```{python}
+#final_crime_data = pd.read_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\final_crime_data.csv')
+#final_crime_data['DATE'] = pd.to_datetime(final_crime_data['YearMonthDay'])
+#filtered_crime_data = final_crime_data[
+#    (final_crime_data['DATE'].dt.year >= 2010) & (final_crime_data['DATE'].dt.year <= 2015)
+#]
+#filtered_crime_data.to_csv('filtered_crime_data.csv', index=False)
+```
+
+So this is the filtered data from 2010-2015
+
+Crime data grouping and removing unneccesary columns 
+
+And making a function to group crime types
+```{python}
 
 
 ```
 
+```{python}
+filtered_weather_data = pd.read_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\Final project\weatherfinal_cleaned.csv')
+filtered_crime_data = pd.read_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\Final project\filtered_crime_data.csv')
+```
 
 ```{python}
-import pandas as pd
 
+unique_primary_types = filtered_crime_data['Primary Type'].unique()
 
-final_crime_data = pd.read_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\final_crime_data.csv')
+def categorize_crime(crime_type):
+    if crime_type in ['BATTERY', 'ASSAULT', 'ROBBERY', 'SEX OFFENSE', 
+                      'CRIM SEXUAL ASSAULT', 'CRIMINAL SEXUAL ASSAULT', 
+                      'HOMICIDE', 'KIDNAPPING', 'STALKING', 'INTIMIDATION']:
+        return 'Violent Crimes'
+    elif crime_type in ['MOTOR VEHICLE THEFT', 'THEFT', 'BURGLARY', 
+                        'CRIMINAL DAMAGE', 'ARSON', 'CRIMINAL TRESPASS']:
+        return 'Property Crimes'
+    elif crime_type in ['WEAPONS VIOLATION', 'PUBLIC PEACE VIOLATION', 
+                        'LIQUOR LAW VIOLATION', 'OBSCENITY', 
+                        'PUBLIC INDECENCY', 'CONCEALED CARRY LICENSE VIOLATION']:
+        return 'Public Order and Regulatory Violations'
+    else:
+        return 'Other Offenses'
 
-# Convert the 'YearMonthDay' column to datetime format
-final_crime_data['DATE'] = pd.to_datetime(final_crime_data['YearMonthDay'])
+filtered_crime_data['Crime Type Group'] = filtered_crime_data['Primary Type'].apply(categorize_crime)
 
-# Filter for the years 2010 to 2015
-filtered_crime_data = final_crime_data[
-    (final_crime_data['DATE'].dt.year >= 2010) & (final_crime_data['DATE'].dt.year <= 2015)
+columns_to_drop = [
+    'YearMonthDay', 'Block', 'IUCR', 'Primary Type', 'Description',
+    'Location Description', 'Arrest', 'Domestic', 'Beat', 'Ward',
+    'FBI Code', 'X Coordinate', 'Y Coordinate', 'Year', 'Location',
+    'ID', 'District', 'Community Area', 'index_right', 'INTPTLAT10', 
+    'INTPTLON10'
 ]
 
-# Display the filtered DataFrame
-print(filtered_crime_data.head())
+filtered_crime_data = filtered_crime_data.drop(columns=columns_to_drop)
 
-# Save the filtered dataset to a new file if needed
-filtered_crime_data.to_csv('filtered_crime_data.csv', index=False)
+filtered_crime_data = filtered_crime_data.dropna(subset=['ZCTA5CE10'])
+filtered_crime_data['ZCTA5CE10'] = filtered_crime_data['ZCTA5CE10'].astype(int)
 
-```
+filtered_crime_data.rename(columns={'ZCTA5CE10': 'ZIP_CODE'}, inplace=True)
 
-```{python}
-# Display the filtered DataFrame
 print(filtered_crime_data.head())
 ```
 
-```{python}
 
-import pandas as pd
-
-filtered_weather_data = pd.read_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\Final project\short_weather_df.csv')
-
-filtered_crime_data = pd.read_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\Final project\filtered_crime_data.csv')
-
-print(filtered_weather_data.head())
-
-print(filtered_crime_data.head())
-
-
-```
-
-
-Merging 
-
+#Merging 
 
 ```{python}
 
-
-import pandas as pd
-
-# Load the filtered datasets
-filtered_weather_data = pd.read_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\Final project\short_weather_df.csv')
-filtered_crime_data = pd.read_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\Final project\filtered_crime_data.csv')
-
-# Ensure DATE columns are in datetime format
 filtered_crime_data['DATE'] = pd.to_datetime(filtered_crime_data['DATE'])
 filtered_weather_data['DATE'] = pd.to_datetime(filtered_weather_data['DATE'])
 
-# Aggregate crime counts by date and ZIP code
-crime_summary = filtered_crime_data.groupby(['DATE', 'ZCTA5CE10']).size().reset_index(name='Crime Count')
+crime_summary = filtered_crime_data.groupby(['DATE', 'ZIP_CODE', 'Crime Type Group']).size().reset_index(name='Crime Count')
 
-# Aggregate average temperature by date and ZIP code
-weather_summary = filtered_weather_data.groupby(['DATE', 'ZCTA5CE10'])['TAVG'].mean().reset_index()
+weather_summary = filtered_weather_data.groupby(['DATE', 'ZIP_CODE'])['TAVG'].mean().reset_index()
 
-# Merge datasets on DATE and ZCTA5CE10
 merged_data = pd.merge(
     crime_summary,
     weather_summary,
-    on=['DATE', 'ZCTA5CE10'],
+    on=['DATE', 'ZIP_CODE'],
     how='inner'
 )
 
-# Select relevant columns and preview the merged dataset
-print(merged_data.head())
-
-# Optionally save the merged dataset
 merged_data.to_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\Final project\merged_data.csv', index=False)
 
+print(merged_data.head())
 
 ```
 
+#Now that the data is filtered lets make the two charts
 
-
-
-Now that the data is filtered lets make the two charts
-
-
-Scatterplot
+#Scatterplot:
 
 ```{python}
 
-import pandas as pd
-import matplotlib.pyplot as plt
-
-# Load datasets
 filtered_weather_data = pd.read_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\Final project\short_weather_df.csv')
 filtered_crime_data = pd.read_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\Final project\filtered_crime_data.csv')
 
@@ -399,141 +395,9 @@ plt.show()
 
 ```
 
-Heatmap
+Barchart
 
 ```{python}
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-# Load datasets
-filtered_weather_data = pd.read_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\Final project\short_weather_df.csv')
-filtered_crime_data = pd.read_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\Final project\filtered_crime_data.csv')
-
-# Ensure DATE columns are in datetime format
-filtered_crime_data['DATE'] = pd.to_datetime(filtered_crime_data['DATE'])
-filtered_weather_data['DATE'] = pd.to_datetime(filtered_weather_data['DATE'])
-
-# Extract month from the DATE column
-filtered_crime_data['Month'] = filtered_crime_data['DATE'].dt.month
-filtered_weather_data['Month'] = filtered_weather_data['DATE'].dt.month
-
-# Handle missing values in ZCTA5CE10
-filtered_crime_data = filtered_crime_data.dropna(subset=['ZCTA5CE10'])
-filtered_weather_data = filtered_weather_data.dropna(subset=['ZCTA5CE10'])
-
-# Convert ZCTA5CE10 to integers
-filtered_crime_data['ZCTA5CE10'] = filtered_crime_data['ZCTA5CE10'].astype(int)
-filtered_weather_data['ZCTA5CE10'] = filtered_weather_data['ZCTA5CE10'].astype(int)
-
-# Group ZIP codes into 10 categories based on quantiles
-zip_groups = pd.qcut(filtered_crime_data['ZCTA5CE10'], 10, labels=False)
-filtered_crime_data['ZIP Group'] = zip_groups
-filtered_weather_data['ZIP Group'] = pd.cut(
-    filtered_weather_data['ZCTA5CE10'],
-    bins=pd.qcut(filtered_crime_data['ZCTA5CE10'], 10, retbins=True)[1],
-    labels=False,
-    include_lowest=True
-)
-
-# Aggregate crime data by Month and ZIP group
-crime_summary = filtered_crime_data.groupby(['Month', 'ZIP Group']).size().reset_index(name='Crime Count')
-
-# Aggregate weather data by Month and ZIP group
-weather_summary = filtered_weather_data.groupby(['Month', 'ZIP Group'])['TAVG'].mean().reset_index()
-
-# Merge datasets on Month and ZIP group
-merged_data = pd.merge(crime_summary, weather_summary, on=['Month', 'ZIP Group'], how='outer')
-
-# Fill missing data
-merged_data['Crime Count'].fillna(0, inplace=True)
-merged_data['TAVG'].fillna(0, inplace=True)
-
-# Pivot data for the heatmap
-heatmap_data = merged_data.pivot_table(
-    index='ZIP Group', 
-    columns='Month', 
-    values='TAVG', 
-    aggfunc='mean'
-)
-
-# Pivot data for annotations
-annotation_data = merged_data.pivot_table(
-    index='ZIP Group', 
-    columns='Month', 
-    values='Crime Count', 
-    aggfunc='sum'
-)
-
-# Align shapes of both dataframes
-heatmap_data, annotation_data = heatmap_data.align(annotation_data, join='inner', axis=1)
-
-# Create the heatmap
-plt.figure(figsize=(12, 8))
-sns.heatmap(
-    heatmap_data, 
-    annot=annotation_data, 
-    fmt='.0f', 
-    cmap='coolwarm', 
-    cbar_kws={'label': 'Average Temperature (TAVG)'}
-)
-
-# Add labels and title
-plt.title('Heatmap of Temperature by Month and ZIP Code Groups\nCrime Count as Annotations', fontsize=14)
-plt.xlabel('Month')
-plt.ylabel('ZIP Code Group')
-plt.tight_layout()
-plt.show()
-
-```
-
-## Shiny App
-```{python}
-
-
-
-# Ensure DATE columns are in datetime format
-filtered_crime_data['DATE'] = pd.to_datetime(filtered_crime_data['DATE'])
-filtered_weather_data['DATE'] = pd.to_datetime(filtered_weather_data['DATE'])
-
-# Merge datasets on DATE and ZCTA5CE10
-merged_data = pd.merge(
-    filtered_crime_data,
-    filtered_weather_data[['DATE', 'ZCTA5CE10', 'TAVG']],
-    on=['DATE', 'ZCTA5CE10'],
-    how='inner'
-)
-
-# Create temperature bins (0, 15, 30, 45, 60, 75, 90)
-temp_bins = [0, 15, 30, 45, 60, 75, 90]
-temp_labels = [f'{temp_bins[i]}-{temp_bins[i+1]-1}°F' for i in range(len(temp_bins) - 1)]
-merged_data['Temp Range'] = pd.cut(merged_data['TAVG'], bins=temp_bins, labels=temp_labels, include_lowest=True)
-
-# Group by temperature range and crime type
-crime_by_temp = merged_data.groupby(['Temp Range', 'Primary Type']).size().reset_index(name='Crime Count')
-
-# Pivot data to prepare for stacked bar chart
-pivot_data = crime_by_temp.pivot(index='Temp Range', columns='Primary Type', values='Crime Count').fillna(0)
-
-# Plot the stacked bar chart
-pivot_data.plot(kind='bar', stacked=True, figsize=(12, 8))
-
-# Customize the chart
-plt.title('Crime Types by Temperature Range', fontsize=16)
-plt.xlabel('Temperature Range (°F)', fontsize=12)
-plt.ylabel('Crime Count', fontsize=12)
-plt.legend(title='Crime Types', bbox_to_anchor=(1.05, 1), loc='upper left')
-plt.tight_layout()
-
-# Show the plot
-plt.show()
-
-
-```
-
-
-```{python}
-
 
 # Ensure DATE columns are in datetime format
 filtered_crime_data['DATE'] = pd.to_datetime(filtered_crime_data['DATE'])
@@ -574,73 +438,9 @@ plt.show()
 ```
 
 
-
-```{python}
-
-# Load datasets
-weather_short = pd.read_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\Final project\short_weather_df.csv')
-crime_short = pd.read_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\Final project\filtered_crime_data.csv')
+## Shiny App
 
 
 
-crime_short['date'] = pd.to_datetime(crime_short['DATE'])
-weather_short['date'] = pd.to_datetime(weather_short['DATE'])
-
-# Group by date and ZIP code
-crime_counts_per_zip = crime_short.groupby(['date', 'ZCTA5CE10']).size().reset_index(name='total_crimes')
-print(crime_counts_per_zip.head())
-
-# Merge with weather data
-merged_df = pd.merge(crime_counts_per_zip, weather_short, on='date', how='right')
-print(merged_df.head())
 
 
-
-```
-
-
-```{python}
-
-#Making a function to group crime types
-
-filtered_crime_data = pd.read_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\Final project\filtered_crime_data.csv')
-unique_primary_types = filtered_crime_data['Primary Type'].unique()
-
-def categorize_crime(crime_type):
-    if crime_type in ['BATTERY', 'ASSAULT', 'ROBBERY', 'SEX OFFENSE', 
-                      'CRIM SEXUAL ASSAULT', 'CRIMINAL SEXUAL ASSAULT', 
-                      'HOMICIDE', 'KIDNAPPING', 'STALKING', 'INTIMIDATION']:
-        return 'Violent Crimes'
-    elif crime_type in ['MOTOR VEHICLE THEFT', 'THEFT', 'BURGLARY', 
-                        'CRIMINAL DAMAGE', 'ARSON', 'CRIMINAL TRESPASS']:
-        return 'Property Crimes'
-    elif crime_type in ['WEAPONS VIOLATION', 'PUBLIC PEACE VIOLATION', 
-                        'LIQUOR LAW VIOLATION', 'OBSCENITY', 
-                        'PUBLIC INDECENCY', 'CONCEALED CARRY LICENSE VIOLATION']:
-        return 'Public Order and Regulatory Violations'
-    else:
-        return 'Other Offenses'
-
-# Apply it to make a new column
-filtered_crime_data['Crime Type Group'] = filtered_crime_data['Primary Type'].apply(categorize_crime)
-
-# If you want to heck the result
-#print(filtered_crime_data[['Primary Type', 'Crime Type Group']].head())
-
-columns_to_drop = [
-    'YearMonthDay', 'Block', 'IUCR', 'Primary Type', 'Description',
-    'Location Description', 'Arrest', 'Domestic', 'Beat', 'Ward',
-    'FBI Code', 'X Coordinate', 'Y Coordinate', 'Year', 'Location',
-    'ID', 'District', 'Community Area', 'index_right', 'INTPTLAT10', 
-    'INTPTLON10'
-]
-
-filtered_crime_data = filtered_crime_data.drop(columns=columns_to_drop)
-
-#Making the zip code an int
-filtered_crime_data = filtered_crime_data.dropna(subset=['ZCTA5CE10'])
-filtered_crime_data['ZCTA5CE10'] = filtered_crime_data['ZCTA5CE10'].astype(int)
-
-#Dataframe preview
-print(filtered_crime_data.head())
-```
