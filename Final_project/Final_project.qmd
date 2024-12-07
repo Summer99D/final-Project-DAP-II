@@ -4,8 +4,16 @@ title: "DAP II:Final Project"
 author: "Genevieve Madigan, Summer Negahdar, Jenny Zhong"
 date: "Fall 2024"
 format: html
+execute:
+  echo: false
+  eval: true
+
 
 ---
+## the link to google drive for data
+
+https://drive.google.com/drive/folders/1U2egyK2B7HBMOuB5wlj-HAs8HkjFLrJk?usp=drive_link
+
 # workflow and team members
 Genevieve Madigan: #write your github Id here: 
 -responsibility: write up and data visualization
@@ -49,7 +57,7 @@ import geopandas as gpd
 import shapely
 import shiny
 from shapely.geometry import Point
-import pgeocode
+
 ```
 
 ```{python}
@@ -241,16 +249,10 @@ final csv file for weather
 weather_with_zip.to_csv("final_weather_data.csv", index=False)
 ```
 
-# Apply function to your data
-
-# Save the updated dataframe to a new CSV
+```{python}
 
 
-
-
-
-
-## Data experiment
+```
 
 
 ## Data Visualization
