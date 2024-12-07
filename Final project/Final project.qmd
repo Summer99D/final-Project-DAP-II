@@ -291,15 +291,12 @@ So this is the filtered data from 2010-2015
 Crime data grouping and removing unneccesary columns 
 
 And making a function to group crime types
-```{python}
-
-
-```
 
 ```{python}
 filtered_weather_data = pd.read_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\Final project\weatherfinal_cleaned.csv')
 filtered_crime_data = pd.read_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\Final project\filtered_crime_data.csv')
 ```
+
 
 ```{python}
 
@@ -340,102 +337,119 @@ filtered_crime_data.rename(columns={'ZCTA5CE10': 'ZIP_CODE'}, inplace=True)
 print(filtered_crime_data.head())
 ```
 
-
-#Merging 
+Merging
 
 ```{python}
 
+# Ensure DATE columns are in datetime format
 filtered_crime_data['DATE'] = pd.to_datetime(filtered_crime_data['DATE'])
 filtered_weather_data['DATE'] = pd.to_datetime(filtered_weather_data['DATE'])
 
+# Group the crime data to create a Crime Count column
 crime_summary = filtered_crime_data.groupby(['DATE', 'ZIP_CODE', 'Crime Type Group']).size().reset_index(name='Crime Count')
 
-weather_summary = filtered_weather_data.groupby(['DATE', 'ZIP_CODE'])['TAVG'].mean().reset_index()
-
+# Merge the grouped crime summary with the weather data on DATE and ZIP_CODE
 merged_data = pd.merge(
     crime_summary,
-    weather_summary,
+    filtered_weather_data[['DATE', 'ZIP_CODE', 'TAVG', 'geometry']],  # Select relevant weather columns
     on=['DATE', 'ZIP_CODE'],
-    how='inner'
+    how='inner'  # Use 'inner' to match rows in both datasets
 )
 
-merged_data.to_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\Final project\merged_data.csv', index=False)
-
+# Display the first few rows of the merged dataset
 print(merged_data.head())
 
+# Save the merged dataset to a CSV file
+merged_data.to_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\Final project\merged_data.csv', index=False)
+
+
 ```
+
+
 
 #Now that the data is filtered lets make the two charts
 
-#Scatterplot:
+
+#BarChart
 
 ```{python}
+import pandas as pd
+import matplotlib.pyplot as plt
 
-filtered_weather_data = pd.read_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\Final project\short_weather_df.csv')
-filtered_crime_data = pd.read_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\Final project\filtered_crime_data.csv')
-
-# Ensure DATE columns are in datetime format
-filtered_crime_data['DATE'] = pd.to_datetime(filtered_crime_data['DATE'])
-filtered_weather_data['DATE'] = pd.to_datetime(filtered_weather_data['DATE'])
-
-# Aggregate crime data by DATE
-crime_summary = filtered_crime_data.groupby('DATE').size().reset_index(name='Crime Count')
-
-# Aggregate weather data by DATE
-weather_summary = filtered_weather_data.groupby('DATE')['TAVG'].mean().reset_index()
-
-# Plot scatterplot
-plt.scatter(weather_summary['TAVG'], crime_summary['Crime Count'], alpha=0.5)
-plt.title('Crime Count vs. Average Temperature')
-plt.xlabel('Average Temperature (TAVG)')
-plt.ylabel('Crime Count')
-plt.grid(True)
-plt.show()
-
-
-```
-
-Barchart
-
-```{python}
-
-# Ensure DATE columns are in datetime format
-filtered_crime_data['DATE'] = pd.to_datetime(filtered_crime_data['DATE'])
-filtered_weather_data['DATE'] = pd.to_datetime(filtered_weather_data['DATE'])
-
-# Merge datasets on DATE and ZCTA5CE10
-merged_data = pd.merge(
-    filtered_crime_data,
-    filtered_weather_data[['DATE', 'ZCTA5CE10', 'TAVG']],
-    on=['DATE', 'ZCTA5CE10'],
-    how='inner'
+# Bin the temperature data into 15-unit ranges
+filtered_weather_data['TAVG_bin'] = pd.cut(
+    filtered_weather_data['TAVG'], 
+    bins=range(int(filtered_weather_data['TAVG'].min()) // 15 * 15, 
+               int(filtered_weather_data['TAVG'].max()) // 15 * 15 + 15, 
+               15), 
+    right=False
 )
 
-# Create temperature bins (0-10, 10-20, ..., 70-80)
-temp_bins = [0, 10, 20, 30, 40, 50, 60, 70, 80]
-temp_labels = [f'{temp_bins[i]}-{temp_bins[i+1]-1}°F' for i in range(len(temp_bins) - 1)]
-merged_data['Temp Range'] = pd.cut(merged_data['TAVG'], bins=temp_bins, labels=temp_labels, include_lowest=True)
+# Merge crime and weather data to keep crime group info
+merged_data_with_bins = pd.merge(
+    merged_data,
+    filtered_weather_data[['DATE', 'TAVG_bin']], 
+    on='DATE',
+    how='left'
+)
 
-# Group by temperature range and crime type
-crime_by_temp = merged_data.groupby(['Temp Range', 'Primary Type']).size().reset_index(name='Crime Count')
+# Group data by TAVG_bin and Crime Type Group
+crime_distribution = merged_data_with_bins.groupby(['TAVG_bin', 'Crime Type Group'])['Crime Count'].sum().unstack(fill_value=0)
 
-# Pivot data to prepare for stacked bar chart
-pivot_data = crime_by_temp.pivot(index='Temp Range', columns='Primary Type', values='Crime Count').fillna(0)
-
-# Plot the stacked bar chart
-pivot_data.plot(kind='bar', stacked=True, figsize=(12, 8))
-
-# Customize the chart
-plt.title('Crime Types by Temperature Range', fontsize=16)
-plt.xlabel('Temperature Range (°F)', fontsize=12)
-plt.ylabel('Crime Count', fontsize=12)
-plt.legend(title='Crime Types', bbox_to_anchor=(1.05, 1), loc='upper left')
+# Plot stacked bar chart
+crime_distribution.plot(kind='bar', stacked=True, figsize=(12, 7), width=0.9)
+plt.title('Crime Distribution by Temperature Range (Binned by 15)')
+plt.xlabel('Temperature Range (°F)')
+plt.ylabel('Total Crime Count')
+plt.xticks(rotation=45, ha='right')  # Rotate x-axis labels for better readability
+plt.legend(title='Crime Type Group')
+plt.grid(axis='y', linestyle='--', alpha=0.7)
 plt.tight_layout()
-
-# Show the plot
 plt.show()
- 
+
+
 ```
+
+
+#Aggregated time series
+```{python}
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Load the merged dataset
+merged_data_path = r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\Final project\merged_data.csv'
+merged_data = pd.read_csv(merged_data_path)
+
+# Ensure DATE column is in datetime format
+merged_data['DATE'] = pd.to_datetime(merged_data['DATE'])
+
+# Aggregate data by Date across all ZIP codes
+all_zip_time_series = merged_data.groupby('DATE').agg(
+    total_crime=('Crime Count', 'sum'),  # Sum up crime counts
+    avg_temp=('TAVG', 'mean')  # Average temperature
+).reset_index()
+
+# Plot the time-series
+plt.figure(figsize=(12, 6))
+
+# Plot Crime Count
+plt.plot(all_zip_time_series['DATE'], all_zip_time_series['total_crime'], label='Total Crime', color='red')
+
+# Plot Average Temperature
+plt.plot(all_zip_time_series['DATE'], all_zip_time_series['avg_temp'], label='Average Temperature (TAVG)', color='blue')
+
+# Add titles and labels
+plt.title('City-Wide Crime and Temperature Trends Over Time', fontsize=16)
+plt.xlabel('Date', fontsize=12)
+plt.ylabel('Count / Temperature', fontsize=12)
+plt.legend()
+plt.grid(True)
+
+# Display the plot
+plt.show()
+
+```
+
 
 
 ## Shiny App
