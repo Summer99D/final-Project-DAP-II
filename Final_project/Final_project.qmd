@@ -43,8 +43,16 @@ Another issue we encountered was standardizing date formats across the crime and
 ```{python}
 import pandas as pd
 import geopandas as gpd
+import shapely
 import pandas as pd
 from shapely.geometry import Point
+import matplotlib.pyplot as plt
+import altair as alt
+import numpy as np
+import shiny
+```
+
+
 ```
 
 As mentioned above, after the presentation, we decided that we would shorten our datasets to 2010 - 2015 so it would be easier to load into our laptops. Subsequently, the code we have accommodates this change below. 
@@ -223,22 +231,8 @@ weatherfinal.to_csv('/Users/jennyzhong/Documents/GitHub/final-Project-DAP-II/Fin
 # Apply function to your data
 
 
+
 # Save the updated dataframe to a new CSV
-
-
-
-
-2. save the file as df and as csv file (in the data folder)
-3. upload crime rate
-4. clean crime df
-5. save it as df and as csv (in data folder)
-6. merge both dfs based on ????
-7. make a scatterplot of crime rate and temperature
-8. make a base map (shapely)
-9. make a heated map using scatterplot and base map
-10. save the final merged csv(in data folder)
-11. shiny app
-12. (extra credit): use NLP for finding crime-heat (it sohuld not be hard I'd say)
 
 
 
