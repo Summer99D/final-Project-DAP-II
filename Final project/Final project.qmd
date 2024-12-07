@@ -267,9 +267,7 @@ import shiny
 
 ## Data Visualization
 #merging the data
-#For the following data, we decided to filter the information down to 
-#2010-2015 because 30 GB is way too much, the following code is how we 
-#shrunk the data 
+#For the following data, we decided to filter the information down to 2010-2015 because 30 GB is way too much, the following code is how we shrunk the data. 
 
 ```{python}
 #final_crime_data = pd.read_csv(r'C:\Users\madig\Documents\Github\Year 2024-2025\final-Project-DAP-II\final_crime_data.csv')
@@ -431,7 +429,6 @@ plt.grid(True)
 plt.show()
 
 ```
-
 
 
 ## Shiny App
