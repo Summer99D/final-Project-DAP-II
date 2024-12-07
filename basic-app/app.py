@@ -35,8 +35,8 @@ def server(input, output, session):
         # Step 3: Calculate average crimes for this temperature in each ZIP code
         avg_crimes = temp_data.groupby('ZIP_CODE')['Crime Count'].mean().reset_index()
         
-        # Step 4: Convert ZIP codes to string for merging
-        avg_crimes['ZIP_CODE'] = avg_crimes['ZIP_CODE'].astype(str)
+        # Convert ZIP codes to string for merging
+        avg_crimes['ZIP_CODE'] = avg_crimes['ZIP_CODE'].astype(str).str.zfill(5)
         
         return avg_crimes
 
@@ -47,7 +47,9 @@ def server(input, output, session):
         # Load Chicago ZIP code shapefile
         url = "https://data.cityofchicago.org/api/geospatial/unjd-c2ca?method=export&format=GeoJSON"
         chicago_gdf = gpd.read_file(url)
-        chicago_gdf['zip'] = chicago_gdf['zip'].astype(str)
+        
+        # Convert zip codes to string for merging
+        chicago_gdf['zip'] = chicago_gdf['zip'].astype(str).str.zfill(5)
 
         # Merge crime data with geodataframe
         merged_gdf = chicago_gdf.merge(avg_crimes, left_on='zip', right_on='ZIP_CODE', how='left')
@@ -61,7 +63,9 @@ def server(input, output, session):
             legend=True,
             cmap='YlOrRd',
             missing_kwds={'color': 'lightgrey'},
-            legend_kwds={'label': 'Average Crime count'}
+            legend_kwds={'label': 'Average Crime count'},
+            edgecolor='black',
+            linewidth=0.5
         )
 
         plt.title(f"Average Crime Count at {input.temp_slider()}°F")
@@ -70,3 +74,6 @@ def server(input, output, session):
 
 # Create and run the app
 app = App(app_ui, server)
+
+if __name__ == "__main__":
+    app.run(host="127.0.0.1", port=8001)
