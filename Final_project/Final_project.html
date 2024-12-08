@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Genevieve Madigan, Summer Negahdar, Jenny Zhong">
+<meta name="dcterms.date" content="2024-01-01">
+
+<title>DAP II: Final Project</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="Final_project_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Final_project_files/libs/quarto-html/quarto.js"></script>
+<script src="Final_project_files/libs/quarto-html/popper.min.js"></script>
+<script src="Final_project_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Final_project_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Final_project_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Final_project_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Final_project_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Final_project_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Final_project_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">DAP II: Final Project</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Genevieve Madigan, Summer Negahdar, Jenny Zhong </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">January 1, 2024</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="workflow-and-team-members" class="level5" style="font-size: 12px;">
+<h5 class="anchored" data-anchor-id="workflow-and-team-members">Workflow and Team Members</h5>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 26%">
+<col style="width: 24%">
+<col style="width: 49%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>GitHub Username</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Genevieve Madigan</td>
+<td>Madigan989</td>
+<td>Write-up and data visualization</td>
+</tr>
+<tr class="even">
+<td>Summer Negahdar</td>
+<td>Summer99D</td>
+<td>Creation of Shiny app and data visualization</td>
+</tr>
+<tr class="odd">
+<td>Jenny Zhong</td>
+<td>datapolicypython</td>
+<td>Data cleaning and preparation</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="research-question" class="level5" style="font-size: 12px;">
+<h5 class="anchored" data-anchor-id="research-question">Research Question:</h5>
+<p>Our project investigates the impact of temperature on crime rates in Chicago, focusing on both violent and non-violent crimes within specific ZIP codes. Building on prior research, we analyze data from 2010–2015 to test the temperature-aggression hypothesis and routine activity theory, which suggest that higher temperatures increase aggression and influence daily activities, creating more opportunities for crime. Understanding these dynamics can inform public safety strategies and resource allocation in response to climate patterns. This study extends findings from earlier research, testing conclusions across a period of varying political leadership and economic conditions. By exploring environmental factors’ effects on criminal activity, we aim to provide insights into how climate patterns shape public safety challenges. This research highlights the potential role of temperature in influencing crime trends and offers practical applications for crime prevention and resource planning.</p>
+</section>
+<section id="methodology" class="level5" style="font-size: 12px;">
+<h5 class="anchored" data-anchor-id="methodology">Methodology</h5>
+<p>We analyzed crime data (2010–2015) from the Chicago Data Portal and weather data from NOAA, aligning both to ZIP codes using ZCTA shapefiles. Python was used to convert coordinates into geospatial points, reproject data, and apply spatial buffers for accuracy. A spatial join mapped crime and weather data to ZIP codes, followed by cleaning, narrowing the timeframe, and standardizing formats, creating a framework to explore temperature’s impact on crime in Chicago.</p>
+</section>
+<section id="challenges" class="level5" style="font-size: 12px;">
+<h5 class="anchored" data-anchor-id="challenges">Challenges</h5>
+<p>The 30GB crime dataset was narrowed to 2010–2015, reducing it to 13GB but still requiring sampling for efficient processing in the Shiny app. Geospatial analysis and standardizing date formats posed additional challenges, but extensive preprocessing enabled seamless data integration for reliable visualizations like bar charts and choropleth maps.</p>
+</section>
+<section id="crime-data-merging-crime-data-together-and-merging-crime-data-with-zip-code" class="level5" style="font-size: 12px;">
+<h5 class="anchored" data-anchor-id="crime-data-merging-crime-data-together-and-merging-crime-data-with-zip-code">Crime data: Merging crime data together and merging crime data with ZIP Code</h5>
+</section>
+<div style="font-size: 12px;">
+<p>As mentioned above, after the presentation, we decided that we would shorten our datasets to 2010 - 2015 so it would be easier to load into our laptops. Subsequently, the code we have accommodates this change below. First, we load the CSV datasets into dataframes into python. Then we examine the columns of crime data. We then merge the datasets together so we have a crime rate dataset from 2010 - 2015 and examine it. We loaded ZIP code shapefiles, transformed spatial data to a consistent coordinate system (EPSG:4326), and combined it into a GeoDataFrame. Buffer zones enabled a spatial join to map crime data to ZIP codes, with the results saved as a CSV. The data was then cleaned by dropping irrelevant columns, reformatting dates, and reorganizing for clarity before saving.</p>
+</div>
+<section id="now-we-will-convert-the-longitude-and-latitude-in-the-crime-data-into-zip-code-by-using-an-external-shapefile-and-cross-referencing-this-shapefile-with-our-crime-dataset" class="level5" style="font-size: 12px;">
+<h5 class="anchored" data-anchor-id="now-we-will-convert-the-longitude-and-latitude-in-the-crime-data-into-zip-code-by-using-an-external-shapefile-and-cross-referencing-this-shapefile-with-our-crime-dataset">Now we will convert the longitude and latitude in the crime data into ZIP Code by using an external shapefile and cross referencing this shapefile with our crime dataset</h5>
+<p>Here, we are transforming spatial data into a consistent coordinate reference system (EPSG:4326), creating geometric points from longitude and latitude, and combining this data into a GeoDataFrame for spatial analysis. Then we are creating buffer zones around each geometry point in crime_gdf with a radius of 0.01 units, modifying the geometry column to reflect these expanded areas. We are then performing a spatial join to match crime_gdf (containing crime data) with zip_shapes based on their spatial intersection, and saving the resulting data to a CSV file.</p>
+</section>
+<section id="merging-weather-data-together-and-merging-weather-data-with-zip-code" class="level5" style="font-size: 12px;">
+<h5 class="anchored" data-anchor-id="merging-weather-data-together-and-merging-weather-data-with-zip-code">Merging weather data together and merging weather data with ZIP code</h5>
+<p>We combined weather datasets from 2010–2015, converted the data into a GeoDataFrame, and performed a spatial join to align weather data with ZIP codes. After dropping irrelevant columns and refining the data, we saved the cleaned and structured weather dataset as a final CSV file.</p>
+</section>
+<section id="data-visualization" class="level5">
+<h5 class="anchored" data-anchor-id="data-visualization">Data Visualization</h5>
+<div style="font-size: 12px;">
+<p>After filtering data from 2010–2015, we grouped and cleaned crime data, categorized crime types, merged it with weather data by ZIP code and date, and created visualizations including a bar chart, a GeoPandas timeseries, and a choropleth map.</p>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="Picture/graph1.jpeg" class="img-fluid figure-img" style="width:30.0%"></p>
+<figcaption>This bar chart demonstrates crime frequency across temperature ranges.</figcaption>
+</figure>
+</div>
+<div style="font-size: 8px; text-align: center;">
+<p>This bar chart demonstrates crime frequency across temperature ranges, revealing a significant increase in crimes at higher temperatures. This aligns with routine activity theory, as warmer temperatures encourage outdoor activities, potentially increasing encounters between offenders and victims. Conversely, fewer crimes generally occur in colder temperature ranges, likely due to reduced outdoor activities and interactions.</p>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="Picture/Graph2.jpeg" class="img-fluid figure-img" style="width:30.0%"></p>
+<figcaption>This chart illustrates the trend of crime occurrences over time.</figcaption>
+</figure>
+</div>
+<div style="font-size: 8px; text-align: center;">
+<p>This chart illustrates the trend of crime occurrences over time, highlighting a noticeable increase during the summer months, suggesting a seasonal pattern in criminal activity.</p>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="Picture/Graph3.jpeg" class="img-fluid figure-img" style="width:30.0%"></p>
+<figcaption>This choropleth map displays crime locations in Chicago.</figcaption>
+</figure>
+</div>
+<div style="font-size: 8px; text-align: center;">
+<p>This choropleth map displays crime locations in Chicago, with points indicating crime occurrences and their color representing the temperature. Red points signify higher temperatures, while blue points indicate lower temperatures. The map shows that red points are more prominent, suggesting that crimes are more frequent during warmer weather. This highlights a possible connection between temperature and crime rates.</p>
+</div>
+</section>
+<section id="shiny-app" class="level5">
+<h5 class="anchored" data-anchor-id="shiny-app">Shiny App</h5>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="Picture/low_temp.png" class="img-fluid figure-img" style="width:40.0%"></p>
+<figcaption>the intensity of crime per zipcode in chicago when temperature is 33</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="Picture/High_temp.png" class="img-fluid figure-img" style="width:40.0%"></p>
+<figcaption>the intensity of crime per zipcode in chicago when temperature is 69</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="Picture/extra_high.png" class="img-fluid figure-img" style="width:40.0%"></p>
+<figcaption>the intensity of crime per zipcode in chicago when temperature is 89</figcaption>
+</figure>
+</div>
+<div style="font-size: 12px;">
+<p>As we can see there are certain zipcodes that have a high crime rate regardless but in general as temperature increases the number of zipcodes/neighborhoods that have more crimes also spikes. (meaning the total average of crime rate increases in general)</p>
+</div>
+</section>
+<section id="policy-implications" class="level5">
+<h5 class="anchored" data-anchor-id="policy-implications">Policy Implications</h5>
+<div style="font-size: 12px;">
+<p>Our findings demonstrate a positive correlation between temperature and violent crime rates, aligning with prior research on the relationship between environmental factors and criminal activity. This connection underscores the importance of understanding how temperature fluctuations influence public behavior and safety. From a public safety perspective, this insight allows police departments to better anticipate “busy seasons” for violent crimes, particularly during warmer months. With this knowledge, law enforcement agencies can optimize resource allocation, ensuring adequate staffing and preparation to handle increased workloads effectively. Additionally, the implications extend to the broader context of climate change. As global temperatures continue to rise, it becomes increasingly critical to assess and address the potential impacts on public safety. Policymakers can use this information to formulate strategies that mitigate the risks associated with climate-induced changes in crime patterns, contributing to more resilient urban environments.</p>
+</div>
+</section>
+<section id="directions-for-future-work" class="level5">
+<h5 class="anchored" data-anchor-id="directions-for-future-work">Directions for Future Work</h5>
+<div style="font-size: 12px;">
+<p>To broaden the scope and applicability of our findings, future research should expand the analysis to other American cities. This would help determine whether the patterns observed in Chicago are consistent across different urban contexts, offering a more comprehensive understanding of how temperature impacts crime in diverse environments. A global analysis could further enhance the study by assessing whether the relationship between temperature and crime is universal or shaped by cultural and geographic factors. Examining this phenomenon in international settings would provide valuable insights into the broader applicability of our findings and reveal potential variations influenced by societal norms and regional climates. Additionally, incorporating other variables such as humidity, unemployment rates, and urban density could create a more robust and nuanced model. These factors may interact with temperature in complex ways, offering a deeper understanding of the environmental and socio-economic drivers of crime. By expanding this research, we can gain a more thorough understanding of the intersection between climate, public safety, and social behavior, ultimately contributing to more informed policy and crime prevention strategies.</p>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
