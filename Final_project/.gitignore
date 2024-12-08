@@ -182,3 +182,14 @@ short_weather_df.csv
 final_weather_data.csv
 final_crime_dara.csv
 /.quarto/
+Crimes2010.csv
+Crimes20112012.csv
+Crimes201320142015.csv
+filtered_crime_data.csv
+AT2010.csv
+AT2011.csv
+AT2012.csv
+AT2013.csv
+AT2014.csv
+AT2015.csv
+weather_with_zip.csv
