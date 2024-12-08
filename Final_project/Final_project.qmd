@@ -486,4 +486,3 @@ A global analysis could further enhance the study by assessing whether the relat
 Additionally, incorporating other variables such as humidity, unemployment rates, and urban density could create a more robust and nuanced model. These factors may interact with temperature in complex ways, offering a deeper understanding of the environmental and socio-economic drivers of crime. By expanding this research, we can gain a more thorough understanding of the intersection between climate, public safety, and social behavior, ultimately contributing to more informed policy and crime prevention strategies.
 
 </div>
-
